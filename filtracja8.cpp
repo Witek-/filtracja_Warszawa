@@ -23,6 +23,35 @@ int main( int argc, char *argv[] )
 	//SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
 	
 
+	
+
+
+	//vector <double> x;
+	//vector <double> v;
+	//x.push_back(5.);
+	//x.push_back(7.);
+	//x.push_back(10.);
+	//v.push_back(15.);
+	//v.push_back(18.);
+	//v.push_back(22.);
+	//vector <double> new_x;
+	//new_x.push_back(8.);
+	//new_x.push_back(10.);
+	//new_x.push_back(10.1);
+
+	//
+	//vector <double>w=interpolate2(x,v,new_x);
+
+
+
+
+
+
+
+
+
+
+
 	Poligon wroclawska(argv[1] );
 
 
