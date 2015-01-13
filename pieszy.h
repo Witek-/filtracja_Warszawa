@@ -14,40 +14,40 @@ public:
 	string id; /*nazwa pliku*/
 	vector<Frame> frame;
 	string sciezka; /*sciezka do pliku*/
-	
+
 
 	struct Trajektoria
 	{
 		struct Rodzaj
-	{
-		bool dobra; 
-		bool krotka;
-		//bool bardzo_krotka;
-		bool duch;
-		bool pieszy_na_samochodzie;
-		//bool inna;
-		Rodzaj() : dobra(false), krotka(false), /*bardzo_krotka(false),*/ duch(false), pieszy_na_samochodzie(false)/*, inna(false)*/ {}
-	}rodzaj;
+		{
+			bool dobra; 
+			bool krotka;
+			//bool bardzo_krotka;
+			bool duch;
+			bool pieszy_na_samochodzie;
+			//bool inna;
+			Rodzaj() : dobra(false), krotka(false), /*bardzo_krotka(false),*/ duch(false), pieszy_na_samochodzie(false)/*, inna(false)*/ {}
+		}rodzaj;
 
 		struct Dlugosc
-	{
-		float efektywna;
-		float w_pionie;
-		float w_poziomie;
-		float calkowita;
-		Dlugosc() : efektywna(0), w_pionie(0), w_poziomie(0), calkowita(0) {}
-	}dlugosc;
+		{
+			float efektywna;
+			float w_pionie;
+			float w_poziomie;
+			float calkowita;
+			Dlugosc() : efektywna(0), w_pionie(0), w_poziomie(0), calkowita(0) {}
+		}dlugosc;
 		struct Pozycja
 		{
 			struct Pozioma
 			{
-			float minimalna;
-			float maksymalna;
-			float srednia; 
-			Pozioma() : minimalna(9999), maksymalna(-9999), srednia(0) {}
+				float minimalna;
+				float maksymalna;
+				float srednia; 
+				Pozioma() : minimalna(9999), maksymalna(-9999), srednia(0) {}
 			}pozioma;
 		}pozycja;
-		
+
 		struct Predkosc
 		{
 			float minimalna;
@@ -58,9 +58,16 @@ public:
 			Predkosc() : minimalna(9999), maksymalna(0), srednia(0), srednia_z_pozycji(0), odch_st(0) {}
 		}predkosc;
 
+		struct Kierunek
+		{
+			bool w_gore;
+			bool w_dol;
+			Kierunek() : w_gore(false), w_dol(false) {}
+		}kierunek;
+
 		int wspolczynnik_drgan_w_pionie;
 		int wspolczynnik_drgan_w_poziomie;
-		
+
 	}trajektoria;
 
 	struct Konflikt
@@ -73,12 +80,12 @@ public:
 
 	struct Konfliktowy_pojazd
 	{
-	float minimalna_odleglosc; /*najmniejsza odleg³oœæ pomiêdzy danym pieszym, a wszystkimi mijaj¹cymi go samochodami*/
-	float maksymalne_opoznienie; /*najwiêksze (ujemne) zarejestrowane opóŸnienie dla samochodów mijaj¹cych tego pieszego*/
-	float minimalna_predkosc_h; /* najmniejsza zarejestrowana prêdkoœæ dla samochodu najbardziej hamuj¹cego*/
-	float roznica_predkosci_h; /*ró¿nica miêdzy najwiêksz¹, a najmniejsz¹ prêdkoœci¹ dla samochodu najbardziej hamuj¹cego*/
-	float predkosc_najblizszego_na_pasach; /*predkosc samochodu najblizszego do pieszego na srodku pasow*/
-	Konfliktowy_pojazd() : minimalna_odleglosc(888), maksymalne_opoznienie(888), minimalna_predkosc_h(888), roznica_predkosci_h(888), predkosc_najblizszego_na_pasach(888) {}
+		float minimalna_odleglosc; /*najmniejsza odleg³oœæ pomiêdzy danym pieszym, a wszystkimi mijaj¹cymi go samochodami*/
+		float maksymalne_opoznienie; /*najwiêksze (ujemne) zarejestrowane opóŸnienie dla samochodów mijaj¹cych tego pieszego*/
+		float minimalna_predkosc_h; /* najmniejsza zarejestrowana prêdkoœæ dla samochodu najbardziej hamuj¹cego*/
+		float roznica_predkosci_h; /*ró¿nica miêdzy najwiêksz¹, a najmniejsz¹ prêdkoœci¹ dla samochodu najbardziej hamuj¹cego*/
+		float predkosc_najblizszego_na_pasach; /*predkosc samochodu najblizszego do pieszego na srodku pasow*/
+		Konfliktowy_pojazd() : minimalna_odleglosc(888), maksymalne_opoznienie(888), minimalna_predkosc_h(888), roznica_predkosci_h(888), predkosc_najblizszego_na_pasach(888) {}
 	}konfliktowy_pojazd;
 
 	/// Struktura zawieraj¹ca informacje o pojazdach widzianych w czasie rejestracji pieszego
@@ -129,7 +136,7 @@ public:
 	Pieszy();
 
 	int laduj(string nazwa_pliku);
-	
+
 
 
 };
