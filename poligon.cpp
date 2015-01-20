@@ -50,6 +50,8 @@ Poligon::Poligon(string xml)
 		cin.ignore(1);
 		exit(-1);
 	}
+
+
 	//odczyt sciezek
 
 	xml_node object = doc.child("filtracja").child("ustawienia");
@@ -87,76 +89,102 @@ Poligon::Poligon(string xml)
 	sciezka_piesi = object.child_value("piesi");
 	katalog_wyjsciowy=object.child_value("nazwa_katalogu_wyjsciowego");
 
-	//odczyt operacji do wykonania
 
-	//filtry.wykrywanie_duchow.wlaczone=atoi(doc.child("filtracja").child("wykrywanie_duchow").child_value("wlaczone"));
-	//filtry.wykrywanie_duchow.przebyta_odleglosc.mniej_niz=atof(doc.child("filtracja").child("wykrywanie_duchow").child("przebyta_odleglosc").child_value("mniej_niz"));
-	//filtry.wykrywanie_duchow.przebyta_odleglosc.wiecej_niz=atof(doc.child("filtracja").child("wykrywanie_duchow").child("przebyta_odleglosc").child_value("wiecej_niz"));
-	//filtry.wykrywanie_duchow.minimalna_odleglosc_w_pionie=atof(doc.child("filtracja").child("wykrywanie_duchow").child_value("minimalna_odleglosc_w_pionie"));
-	//filtry.wykrywanie_duchow.maksymalna_odleglosc_w_poziomie=atof(doc.child("filtracja").child("wykrywanie_duchow").child_value("maksymalna_odleglosc_w_poziomie"));
-
-
-	if((string)doc.child("filtracja").child("w_wynikach_filtracji_maja_byc").child_value("poprawne")=="tak") 
-		filtry.w_wynikach_maja_byc.poprawne=true;
-	else
-		filtry.w_wynikach_maja_byc.poprawne=false;
-
-	if((string)doc.child("filtracja").child("w_wynikach_filtracji_maja_byc").child_value("niepoprawne")=="tak") 
-		filtry.w_wynikach_maja_byc.niepoprawne=true;
-	else
-		filtry.w_wynikach_maja_byc.niepoprawne=false;
-
-	if((string)doc.child("filtracja").child("w_wynikach_filtracji_maja_byc").child_value("konflikty_odleglosc")=="tak") 
-		filtry.w_wynikach_maja_byc.konflikty_odleglosc=true;
-	else
-		filtry.w_wynikach_maja_byc.konflikty_odleglosc=false;
-
-	if((string)doc.child("filtracja").child("w_wynikach_filtracji_maja_byc").child_value("konflikty_hamowanie")=="tak") 
-		filtry.w_wynikach_maja_byc.konflikty_hamowanie=true;
-	else
-		filtry.w_wynikach_maja_byc.konflikty_hamowanie=false;
-
-
-	if((string)doc.child("filtracja").child("w_wynikach_filtracji_maja_byc").child_value("wszystko")=="tak") 
-		filtry.w_wynikach_maja_byc.wszystko=true;
-	else
-		filtry.w_wynikach_maja_byc.wszystko=false;
-
-
-
-	//wczytanie kryteriów filtracji konfliktów
-
-	filtry.kryteria.hamowanie.opoznienie=atof(doc.child("filtracja").child("kryteria_filtracji_konfliktow").child("hamowanie").child_value("opoznienie_ponizej")); 
-	filtry.kryteria.hamowanie.predkosc=atof(doc.child("filtracja").child("kryteria_filtracji_konfliktow").child("hamowanie").child_value("predkosc_ponizej")); 
-	filtry.kryteria.hamowanie.roznica_predkosci=atof(doc.child("filtracja").child("kryteria_filtracji_konfliktow").child("hamowanie").child_value("roznica_predkosci_powyzej")); 
-	filtry.kryteria.hamowanie.odleglosc_od_pieszego=atof(doc.child("filtracja").child("kryteria_filtracji_konfliktow").child("hamowanie").child_value("odleglosc_od_pieszego")); 
-	filtry.kryteria.odleglosc_i_predkosc.odleglosc_od_pieszego=atof(doc.child("filtracja").child("kryteria_filtracji_konfliktow").child("odleglosc_i_predkosc").child_value("odleglosc_od_pieszego")); 
-	filtry.kryteria.odleglosc_i_predkosc.predkosc_pojazdu=atof(doc.child("filtracja").child("kryteria_filtracji_konfliktow").child("odleglosc_i_predkosc").child_value("predkosc_powyzej")); 
-
-
-	statystyki_dodatkowe.predkosc_pojazdow_w_punkcie.wspolrzedna_x_punktu = atof(doc.child("filtracja").child("statystyki_dodatkowe").child("predkosc_pojazdow_w_punkcie").child_value("wspolrzedna_x_punktu")); 
-
-	forest.load( "piesi20131015-20131015_2.xml" );
-	if( forest.get_tree_count() == 0 )
+	//wpisanie wspolrzednych - na razie z palca, nie z pliku
+	if(sciezka_bazowa.find("POW")!=std::string::npos)
 	{
-
-		cout <<"Blad wczytywania klasyfikatora pieszych, nacisnij ENTER by zakonczyc"<< endl;
-		cin.ignore(1);
-		exit(-1);
+		wspolrzedne_przejscia.x1=-2.0; 
+		wspolrzedne_przejscia.x2=2.0; 
+		wspolrzedne_przejscia.y1=9.0; 
+		wspolrzedne_przejscia.y2=wspolrzedne_przejscia.y1+5.5;
 	}
-
-	sprawdz_katalogi_danych();
-
-	DWORD windows_t1=GetTickCount();
-	wczytaj_dane();
-	DWORD windows_t2=GetTickCount()-windows_t1;
-
-	if(windows_t2/1000<120)
-		printf("\nCzas wczytywania danych [s]: %d\n", windows_t2/1000);
 	else
-		printf("\nCzas wczytywania danych [min]: %.1f\n", 1./60*(windows_t2/1000));
+		if(sciezka_bazowa.find("RAD")!=std::string::npos)
+		{
+			wspolrzedne_przejscia.x1=-2.0; 
+			wspolrzedne_przejscia.x2=2.0; 
+			wspolrzedne_przejscia.y2=0.5; 
+			wspolrzedne_przejscia.y2=wspolrzedne_przejscia.y1+5.5;
+		}
+		else
+		{
 
-	cout << "\nDane wczytane...";
+			cout <<"Zla nazwa poligonu (dopuszczalne POW i RAD), nacisnij ENTER by zakonczyc"<< endl;
+			cin.ignore(1);
+			exit(-1);
+		}
+
+
+		//odczyt operacji do wykonania
+
+		//filtry.wykrywanie_duchow.wlaczone=atoi(doc.child("filtracja").child("wykrywanie_duchow").child_value("wlaczone"));
+		//filtry.wykrywanie_duchow.przebyta_odleglosc.mniej_niz=atof(doc.child("filtracja").child("wykrywanie_duchow").child("przebyta_odleglosc").child_value("mniej_niz"));
+		//filtry.wykrywanie_duchow.przebyta_odleglosc.wiecej_niz=atof(doc.child("filtracja").child("wykrywanie_duchow").child("przebyta_odleglosc").child_value("wiecej_niz"));
+		//filtry.wykrywanie_duchow.minimalna_odleglosc_w_pionie=atof(doc.child("filtracja").child("wykrywanie_duchow").child_value("minimalna_odleglosc_w_pionie"));
+		//filtry.wykrywanie_duchow.maksymalna_odleglosc_w_poziomie=atof(doc.child("filtracja").child("wykrywanie_duchow").child_value("maksymalna_odleglosc_w_poziomie"));
+
+
+		if((string)doc.child("filtracja").child("w_wynikach_filtracji_maja_byc").child_value("poprawne")=="tak") 
+			filtry.w_wynikach_maja_byc.poprawne=true;
+		else
+			filtry.w_wynikach_maja_byc.poprawne=false;
+
+		if((string)doc.child("filtracja").child("w_wynikach_filtracji_maja_byc").child_value("niepoprawne")=="tak") 
+			filtry.w_wynikach_maja_byc.niepoprawne=true;
+		else
+			filtry.w_wynikach_maja_byc.niepoprawne=false;
+
+		if((string)doc.child("filtracja").child("w_wynikach_filtracji_maja_byc").child_value("konflikty_odleglosc")=="tak") 
+			filtry.w_wynikach_maja_byc.konflikty_odleglosc=true;
+		else
+			filtry.w_wynikach_maja_byc.konflikty_odleglosc=false;
+
+		if((string)doc.child("filtracja").child("w_wynikach_filtracji_maja_byc").child_value("konflikty_hamowanie")=="tak") 
+			filtry.w_wynikach_maja_byc.konflikty_hamowanie=true;
+		else
+			filtry.w_wynikach_maja_byc.konflikty_hamowanie=false;
+
+
+		if((string)doc.child("filtracja").child("w_wynikach_filtracji_maja_byc").child_value("wszystko")=="tak") 
+			filtry.w_wynikach_maja_byc.wszystko=true;
+		else
+			filtry.w_wynikach_maja_byc.wszystko=false;
+
+
+
+		//wczytanie kryteriów filtracji konfliktów
+
+		filtry.kryteria.hamowanie.opoznienie=atof(doc.child("filtracja").child("kryteria_filtracji_konfliktow").child("hamowanie").child_value("opoznienie_ponizej")); 
+		filtry.kryteria.hamowanie.predkosc=atof(doc.child("filtracja").child("kryteria_filtracji_konfliktow").child("hamowanie").child_value("predkosc_ponizej")); 
+		filtry.kryteria.hamowanie.roznica_predkosci=atof(doc.child("filtracja").child("kryteria_filtracji_konfliktow").child("hamowanie").child_value("roznica_predkosci_powyzej")); 
+		filtry.kryteria.hamowanie.odleglosc_od_pieszego=atof(doc.child("filtracja").child("kryteria_filtracji_konfliktow").child("hamowanie").child_value("odleglosc_od_pieszego")); 
+		filtry.kryteria.odleglosc_i_predkosc.odleglosc_od_pieszego=atof(doc.child("filtracja").child("kryteria_filtracji_konfliktow").child("odleglosc_i_predkosc").child_value("odleglosc_od_pieszego")); 
+		filtry.kryteria.odleglosc_i_predkosc.predkosc_pojazdu=atof(doc.child("filtracja").child("kryteria_filtracji_konfliktow").child("odleglosc_i_predkosc").child_value("predkosc_powyzej")); 
+
+
+		statystyki_dodatkowe.predkosc_pojazdow_w_punkcie.wspolrzedna_x_punktu = atof(doc.child("filtracja").child("statystyki_dodatkowe").child("predkosc_pojazdow_w_punkcie").child_value("wspolrzedna_x_punktu")); 
+
+		forest.load( "piesi20131015-20131015_2.xml" );
+		if( forest.get_tree_count() == 0 )
+		{
+
+			cout <<"Blad wczytywania klasyfikatora pieszych, nacisnij ENTER by zakonczyc"<< endl;
+			cin.ignore(1);
+			exit(-1);
+		}
+
+		sprawdz_katalogi_danych();
+
+		DWORD windows_t1=GetTickCount();
+		wczytaj_dane();
+		DWORD windows_t2=GetTickCount()-windows_t1;
+
+		if(windows_t2/1000<120)
+			printf("\nCzas wczytywania danych [s]: %d\n", windows_t2/1000);
+		else
+			printf("\nCzas wczytywania danych [min]: %.1f\n", 1./60*(windows_t2/1000));
+
+		cout << "\nDane wczytane...";
 
 
 
@@ -473,79 +501,61 @@ int Poligon::analizuj_trajektorie_pieszych()
 		//dodatkowe parametry
 		//analiza trajektorii
 
-		//najpierw wyznaczenie wspó³rzêdnych pasów, potrzebne do policzenia prêdkoœci pieszego na pasach
-		float y1=0, y2=0; //wspo³rzêdne pionowe pasów
-		if(sciezka_bazowa.find("POW")!=std::string::npos)
+
+		int licznik_zliczen=0; //zlicza ile razy liczylismy œrednie prêdkoœci, a te liczymy tylko w obrêbie pasów (dla wsp Y, X dowolna)
+		for(int l=0;l<p->frame.size();l++)
 		{
-			y1=9.0; y2=y1+5.5;
+			if(p->frame[l].pos.x<p->trajektoria.pozycja.pozioma.minimalna) p->trajektoria.pozycja.pozioma.minimalna=p->frame[l].pos.x;
+			if(p->frame[l].pos.x>p->trajektoria.pozycja.pozioma.maksymalna) p->trajektoria.pozycja.pozioma.maksymalna=p->frame[l].pos.x;
+			p->trajektoria.pozycja.pozioma.srednia+=p->frame[l].pos.x;
+
+			//pieszy musi byæ na pasach; 
+			if(p->frame[l].pos.y>=wspolrzedne_przejscia.y1 && p->frame[l].pos.y<=wspolrzedne_przejscia.y2)
+			{
+				//wpisujemy do pozycji pieszego, ¿e tu jest na pasach - przyda siê póŸniej
+				piesi.pieszy[i].frame[l].pos.na_pasach=true;
+				float predkosc_chwilowa=sqrt(p->frame[l].vel.x*p->frame[l].vel.x+p->frame[l].vel.y*p->frame[l].vel.y);
+				if(predkosc_chwilowa>4) continue; //odrzucamy tak¿e nieprawdopodobne prêdkoœci
+				p->trajektoria.predkosc.srednia+=predkosc_chwilowa;
+				if(predkosc_chwilowa>p->trajektoria.predkosc.maksymalna) p->trajektoria.predkosc.maksymalna=predkosc_chwilowa;
+				if(predkosc_chwilowa<p->trajektoria.predkosc.minimalna) p->trajektoria.predkosc.minimalna=predkosc_chwilowa;
+				licznik_zliczen++;
+			}
+			else
+				piesi.pieszy[i].frame[l].pos.na_pasach=false; // nie jest na pasach
 		}
+		float srednia=p->trajektoria.predkosc.srednia/licznik_zliczen;
+		if(licznik_zliczen>0)
+			p->trajektoria.predkosc.srednia/=licznik_zliczen;
 		else
-			if(sciezka_bazowa.find("RAD")!=std::string::npos)
-			{
-				y1=0.5; y2=y1+5.5;
-			}
-			else
-			{
+			p->trajektoria.predkosc.srednia=0;
 
-				cout <<"Zla nazwa poligonu (dopuszczalne POW i RAD), nacisnij ENTER by zakonczyc"<< endl;
-				cin.ignore(1);
-				exit(-1);
-			}
+		p->trajektoria.pozycja.pozioma.srednia/=p->frame.size();
 
-			int licznik_zliczen=0; //zlicza ile razy liczylismy œrednie prêdkoœci, a te liczymy tylko w obrêbie pasów (dla wsp Y, X dowolna)
-			for(int l=0;l<p->frame.size();l++)
+		//teraz liczenie wariancji prêdkoœci pieszego
+		float wariancja=0;
+		licznik_zliczen=0;
+		for(int l=0;l<p->frame.size();l++)
+			if(p->frame[l].pos.y>=wspolrzedne_przejscia.y1 && p->frame[l].pos.y<=wspolrzedne_przejscia.y2)
 			{
-				if(p->frame[l].pos.x<p->trajektoria.pozycja.pozioma.minimalna) p->trajektoria.pozycja.pozioma.minimalna=p->frame[l].pos.x;
-				if(p->frame[l].pos.x>p->trajektoria.pozycja.pozioma.maksymalna) p->trajektoria.pozycja.pozioma.maksymalna=p->frame[l].pos.x;
-				p->trajektoria.pozycja.pozioma.srednia+=p->frame[l].pos.x;
-
-				//pieszy musi byæ na pasach; 
-				if(p->frame[l].pos.y>=y1 && p->frame[l].pos.y<=y2)
-				{
-					//wpisujemy do pozycji pieszego, ¿e tu jest na pasach - przyda siê póŸniej
-					piesi.pieszy[i].frame[l].pos.na_pasach=true;
-					float predkosc_chwilowa=sqrt(p->frame[l].vel.x*p->frame[l].vel.x+p->frame[l].vel.y*p->frame[l].vel.y);
-					if(predkosc_chwilowa>4) continue; //odrzucamy tak¿e nieprawdopodobne prêdkoœci
-					p->trajektoria.predkosc.srednia+=predkosc_chwilowa;
-					if(predkosc_chwilowa>p->trajektoria.predkosc.maksymalna) p->trajektoria.predkosc.maksymalna=predkosc_chwilowa;
-					if(predkosc_chwilowa<p->trajektoria.predkosc.minimalna) p->trajektoria.predkosc.minimalna=predkosc_chwilowa;
-					licznik_zliczen++;
-				}
-				else
-					piesi.pieszy[i].frame[l].pos.na_pasach=false; // nie jest na pasach
+				float predkosc_chwilowa=sqrt(p->frame[l].vel.x*p->frame[l].vel.x+p->frame[l].vel.y*p->frame[l].vel.y);
+				wariancja+=(predkosc_chwilowa-p->trajektoria.predkosc.srednia)*(predkosc_chwilowa-p->trajektoria.predkosc.srednia);
+				licznik_zliczen++;
 			}
-			float srednia=p->trajektoria.predkosc.srednia/licznik_zliczen;
 			if(licznik_zliczen>0)
-				p->trajektoria.predkosc.srednia/=licznik_zliczen;
+				wariancja/=licznik_zliczen;
 			else
-				p->trajektoria.predkosc.srednia=0;
+				wariancja=0;
+			p->trajektoria.predkosc.odch_st=sqrt(wariancja); //odchylenie standardowe
 
-			p->trajektoria.pozycja.pozioma.srednia/=p->frame.size();
+			//przy okazji notujemy chwile pojawienia sie l znikniecia
+			p->t1=p->frame[0].ts;
+			p->t2=p->frame[p->frame.size()-1].ts;
 
-			//teraz liczenie wariancji prêdkoœci pieszego
-			float wariancja=0;
-			licznik_zliczen=0;
-			for(int l=0;l<p->frame.size();l++)
-				if(p->frame[l].pos.y>=y1 && p->frame[l].pos.y<=y2)
-				{
-					float predkosc_chwilowa=sqrt(p->frame[l].vel.x*p->frame[l].vel.x+p->frame[l].vel.y*p->frame[l].vel.y);
-					wariancja+=(predkosc_chwilowa-p->trajektoria.predkosc.srednia)*(predkosc_chwilowa-p->trajektoria.predkosc.srednia);
-					licznik_zliczen++;
-				}
-				if(licznik_zliczen>0)
-					wariancja/=licznik_zliczen;
-				else
-					wariancja=0;
-				p->trajektoria.predkosc.odch_st=sqrt(wariancja); //odchylenie standardowe
-
-				//przy okazji notujemy chwile pojawienia sie l znikniecia
-				p->t1=p->frame[0].ts;
-				p->t2=p->frame[p->frame.size()-1].ts;
-
-				//maj¹c chwile pojawienia siê l znikniêcia, mo¿emy policzyæ drug¹ œredni¹ prêdkoœæ
-				//na podstawie przebytej odleg³oœci l czasu
-				float t=(p->t2-p->t1)*24*60*60;
-				p->trajektoria.predkosc.srednia_z_pozycji=p->trajektoria.dlugosc.calkowita/t;
+			//maj¹c chwile pojawienia siê l znikniêcia, mo¿emy policzyæ drug¹ œredni¹ prêdkoœæ
+			//na podstawie przebytej odleg³oœci l czasu
+			float t=(p->t2-p->t1)*24*60*60;
+			p->trajektoria.predkosc.srednia_z_pozycji=p->trajektoria.dlugosc.calkowita/t;
 	}
 
 
@@ -730,8 +740,9 @@ int Poligon::znajdz_minimalna_odleglosc_od_pojazdow()
 
 				float odleglosc=999;
 				float predkosc=999;
-				Frame::Pos pozycja_pieszego;
-				Frame::Pos pozycja_pojazdu;
+				Frame::Pos pozycja_pieszego_min; //w punkcie minimalnej odleglosci
+				Frame::Pos pozycja_pojazdu_min; //w punkcie minimalnej odleglosci
+				
 
 				for(int k=0;k<f.size();k++)
 				{
@@ -747,8 +758,8 @@ int Poligon::znajdz_minimalna_odleglosc_od_pojazdow()
 						{
 							odleglosc=odl_tmp;
 							predkosc=sqrt(f[k].vel.x*f[k].vel.x+f[k].vel.y*f[k].vel.y);
-							pozycja_pieszego=g[k].pos;
-							pozycja_pojazdu=f[k].pos;
+							pozycja_pieszego_min=g[k].pos;
+							pozycja_pojazdu_min=f[k].pos;
 
 						}
 					}
@@ -756,37 +767,65 @@ int Poligon::znajdz_minimalna_odleglosc_od_pojazdow()
 				//wpisanie minimalnej odleg³oœci dla tego pieszego i danego pojazdu
 				piesi.pieszy[i].pojazdy.lp.minimalna_odleglosc.push_back(odleglosc);
 				piesi.pieszy[i].pojazdy.lp.predkosc_w_punkcie_minimalnej_odleglosci.push_back(predkosc);
-				piesi.pieszy[i].pojazdy.lp.pozycja_pieszego_w_punkcie_minimalnej_odleglosci.push_back(pozycja_pieszego);
-				piesi.pieszy[i].pojazdy.lp.pozycja_pojazdu_w_punkcie_minimalnej_odleglosci.push_back(pozycja_pojazdu);
+				piesi.pieszy[i].pojazdy.lp.pozycja_pieszego_w_punkcie_minimalnej_odleglosci.push_back(pozycja_pieszego_min);
+				piesi.pieszy[i].pojazdy.lp.pozycja_pojazdu_w_punkcie_minimalnej_odleglosci.push_back(pozycja_pojazdu_min);
 
-				//czy samochod przejechal po palcach czy po pietach
+				if(f.size()<1)
+				{
+					piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach.push_back("???");
+					continue;
+				}
+
+				Frame::Pos pozycja_pieszego_pocz=g[0].pos; //w pierwszej wspolnej klatce
+				Frame::Pos pozycja_pieszego_konc=g[f.size()-1].pos; //w ostatniej wspolnej klatce
+				Frame::Pos pozycja_pojazdu_pocz=f[0].pos; //w pierwszej wspolnej klatce
+				Frame::Pos pozycja_pojazdu_konc=f[f.size()-1].pos; //w ostatniej wspolnej klatce
+
+
+				//czy samochod przejechal po palcach czy po pietach, a moze przepuscil
 
 				if(piesi.pieszy[i].trajektoria.kierunek.w_gore)
-				{	
-					if(pozycja_pojazdu.y>=pozycja_pieszego.y && pozycja_pojazdu.x<=pozycja_pieszego.x)
-						piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach.push_back("po palcach");
-					else 
-						if(pozycja_pojazdu.y>=pozycja_pieszego.y && pozycja_pojazdu.x>pozycja_pieszego.x)
-							piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach.push_back("przepuszczenie?");
-						else 
-							if(pozycja_pojazdu.y<=pozycja_pieszego.y && pozycja_pojazdu.x<=pozycja_pieszego.x)
-								piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach.push_back("po pietach");
+				{
+					if(pozycja_pieszego_pocz.x<pozycja_pojazdu_pocz.x) //tak bedzie prawie zawsze
+						//jesli pozycja minimalna pieszego jest mniejsza, to albo przepuscil albo po pietach
+							if(pozycja_pieszego_min.x<pozycja_pojazdu_min.x) 
+								//skoro ostatnia jest mniejsza, to pelne przepuszczenie
+									if(pozycja_pieszego_konc.x<pozycja_pojazdu_konc.x) 
+										piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach.push_back("przepuszczenie");
+									else
+										//jesli ostatnia nie jest mniejsza, to znaczy ze przepuscil i przejechal po pietach
+										piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach.push_back("po pietach");
+							else
+								//jesli jednak pozycja minimalna pieszego NIE JEST MNIEJSZA niz samochodu
+								//to znaczy ze jest po palcach ALBO po pietach
+								if(pozycja_pieszego_min.y<pozycja_pojazdu_min.y) 
+									piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach.push_back("po palcach");
+								else
+									piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach.push_back("po pietach");
 					else
-								piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach.push_back("hgw");
+						piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach.push_back("hgw");
 				}
 				else
 					if(piesi.pieszy[i].trajektoria.kierunek.w_dol)
 					{
-						if(pozycja_pojazdu.y<=pozycja_pieszego.y && pozycja_pojazdu.x<=pozycja_pieszego.x)
-							piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach.push_back("po palcach");
-						else 
-							if(pozycja_pojazdu.y<=pozycja_pieszego.y && pozycja_pojazdu.x>pozycja_pieszego.x)
-								piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach.push_back("przepuszczenie?");
-							else 
-								if(pozycja_pojazdu.y>=pozycja_pieszego.y && pozycja_pojazdu.x<=pozycja_pieszego.x)
-									piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach.push_back("po pietach");
+						if(pozycja_pieszego_pocz.x<pozycja_pojazdu_pocz.x) //tak bedzie prawie zawsze
+							//jesli pozycja minimalna pieszego jest mniejsza, to albo przepuscil albo po pietach
+								if(pozycja_pieszego_min.x<pozycja_pojazdu_min.x) 
+									//skoro ostatnia jest mniejsza, to pelne przepuszczenie
+										if(pozycja_pieszego_konc.x<pozycja_pojazdu_konc.x) 
+											piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach.push_back("przepuszczenie");
+										else
+											//jesli ostatnia nie jest mniejsza, to znaczy ze przepuscil i przejechal po pietach
+											piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach.push_back("po pietach");
+								else
+									//jesli jednak pozycja minimalna pieszego NIE JEST MNIEJSZA niz samochodu
+									//to znaczy ze jest po palcach ALBO po pietach
+									if(pozycja_pieszego_min.y>pozycja_pojazdu_min.y) 
+										piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach.push_back("po palcach");
+									else
+										piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach.push_back("po pietach");
 						else
-								piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach.push_back("hgw");
+							piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach.push_back("hgw");
 					}
 
 
@@ -797,7 +836,6 @@ int Poligon::znajdz_minimalna_odleglosc_od_pojazdow()
 		//to samo dla prawego pasa
 		if(piesi.pieszy[i].pojazdy.pp.p1!=-1)
 		{
-
 			for(int j=piesi.pieszy[i].pojazdy.pp.p1;j<=piesi.pieszy[i].pojazdy.pp.p2;j++)
 			{	
 
@@ -807,10 +845,12 @@ int Poligon::znajdz_minimalna_odleglosc_od_pojazdow()
 				vector<Frame> g;
 				set_intersection(piesi.pieszy[i].frame.begin(), piesi.pieszy[i].frame.end(),f.begin(), f.end(),back_inserter(g));
 
+				
 				float odleglosc=999;
 				float predkosc=999;
-				Frame::Pos pozycja_pieszego;
-				Frame::Pos pozycja_pojazdu;
+				Frame::Pos pozycja_pieszego_min; //w punkcie minimalnej odleglosci
+				Frame::Pos pozycja_pojazdu_min; //w punkcie minimalnej odleglosci
+		
 
 				for(int k=0;k<f.size();k++)
 				{
@@ -826,41 +866,75 @@ int Poligon::znajdz_minimalna_odleglosc_od_pojazdow()
 						{
 							odleglosc=odl_tmp;
 							predkosc=sqrt(f[k].vel.x*f[k].vel.x+f[k].vel.y*f[k].vel.y);
-							pozycja_pieszego=g[k].pos;
-							pozycja_pojazdu=f[k].pos;
+							pozycja_pieszego_min=g[k].pos;
+							pozycja_pojazdu_min=f[k].pos;
 						}
 					}
 				}
 				//wpisanie minimalnej odleg³oœci dla tego pieszego i danego pojazdu
 				piesi.pieszy[i].pojazdy.pp.minimalna_odleglosc.push_back(odleglosc);
 				piesi.pieszy[i].pojazdy.pp.predkosc_w_punkcie_minimalnej_odleglosci.push_back(predkosc);
-				piesi.pieszy[i].pojazdy.pp.pozycja_pieszego_w_punkcie_minimalnej_odleglosci.push_back(pozycja_pieszego);
-				piesi.pieszy[i].pojazdy.pp.pozycja_pojazdu_w_punkcie_minimalnej_odleglosci.push_back(pozycja_pojazdu);
-				//czy samochod przejechal po palcach czy po pietach
-				if(piesi.pieszy[i].trajektoria.kierunek.w_gore)
-					if(pozycja_pojazdu.y>=pozycja_pieszego.y && pozycja_pojazdu.x<=pozycja_pieszego.x)
-						piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach.push_back("po palcach");
-					else 
-						if(pozycja_pojazdu.y>=pozycja_pieszego.y && pozycja_pojazdu.x>pozycja_pieszego.x)
-							piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach.push_back("przepuszczenie?");
-						else 
-							if(pozycja_pojazdu.y<=pozycja_pieszego.y && pozycja_pojazdu.x<=pozycja_pieszego.x)
-								piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach.push_back("po pietach");
-							else
-								piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach.push_back("hgw");
+				piesi.pieszy[i].pojazdy.pp.pozycja_pieszego_w_punkcie_minimalnej_odleglosci.push_back(pozycja_pieszego_min);
+				piesi.pieszy[i].pojazdy.pp.pozycja_pojazdu_w_punkcie_minimalnej_odleglosci.push_back(pozycja_pojazdu_min);
 
+				if(f.size()<1)
+				{
+					piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach.push_back("???");
+					continue;
+				}
+
+				Frame::Pos pozycja_pieszego_pocz=g[0].pos; //w pierwszej wspolnej klatce
+				Frame::Pos pozycja_pieszego_konc=g[f.size()-1].pos; //w ostatniej wspolnej klatce
+				Frame::Pos pozycja_pojazdu_pocz=f[0].pos; //w pierwszej wspolnej klatce
+				Frame::Pos pozycja_pojazdu_konc=f[f.size()-1].pos; //w ostatniej wspolnej klatce
+
+
+
+				//czy samochod przejechal po palcach czy po pietach, a moze przepuscil
+
+				if(piesi.pieszy[i].trajektoria.kierunek.w_gore)
+				{
+					if(pozycja_pieszego_pocz.x<pozycja_pojazdu_pocz.x) //tak bedzie prawie zawsze
+						//jesli pozycja minimalna pieszego jest mniejsza, to albo przepuscil albo po pietach
+							if(pozycja_pieszego_min.x<pozycja_pojazdu_min.x) 
+								//skoro ostatnia jest mniejsza, to pelne przepuszczenie
+									if(pozycja_pieszego_konc.x<pozycja_pojazdu_konc.x) 
+										piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach.push_back("przepuszczenie");
+									else
+										//jesli ostatnia nie jest mniejsza, to znaczy ze przepuscil i przejechal po pietach
+										piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach.push_back("po pietach");
 							else
-								if(piesi.pieszy[i].trajektoria.kierunek.w_dol)
-									if(pozycja_pojazdu.y<=pozycja_pieszego.y && pozycja_pojazdu.x<=pozycja_pieszego.x)
-										piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach.push_back("po palcach");
-									else 
-										if(pozycja_pojazdu.y<=pozycja_pieszego.y && pozycja_pojazdu.x>pozycja_pieszego.x)
-											piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach.push_back("przepuszczenie?");
-										else 
-											if(pozycja_pojazdu.y>=pozycja_pieszego.y && pozycja_pojazdu.x<=pozycja_pieszego.x)
-												piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach.push_back("po pietach");
+								//jesli jednak pozycja minimalna pieszego NIE JEST MNIEJSZA niz samochodu
+								//to znaczy ze jest po palcach ALBO po pietach
+								if(pozycja_pieszego_min.y<pozycja_pojazdu_min.y) 
+									piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach.push_back("po palcach");
+								else
+									piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach.push_back("po pietach");
+					else
+						piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach.push_back("hgw");
+				}
 				else
-								piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach.push_back("hgw");
+					if(piesi.pieszy[i].trajektoria.kierunek.w_dol)
+					{
+						if(pozycja_pieszego_pocz.x<pozycja_pojazdu_pocz.x) //tak bedzie prawie zawsze
+							//jesli pozycja minimalna pieszego jest mniejsza, to albo przepuscil albo po pietach
+								if(pozycja_pieszego_min.x<pozycja_pojazdu_min.x) 
+									//skoro ostatnia jest mniejsza, to pelne przepuszczenie
+										if(pozycja_pieszego_konc.x<pozycja_pojazdu_konc.x) 
+											piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach.push_back("przepuszczenie");
+										else
+											//jesli ostatnia nie jest mniejsza, to znaczy ze przepuscil i przejechal po pietach
+											piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach.push_back("po pietach");
+								else
+									//jesli jednak pozycja minimalna pieszego NIE JEST MNIEJSZA niz samochodu
+									//to znaczy ze jest po palcach ALBO po pietach
+									if(pozycja_pieszego_min.y>pozycja_pojazdu_min.y) 
+										piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach.push_back("po palcach");
+									else
+										piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach.push_back("po pietach");
+						else
+							piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach.push_back("hgw");
+					}
 			}
 		}
 		//znalezienie najmniejszej odlegloœci ze wszystkich dla danego pieszego
@@ -1934,7 +2008,7 @@ void Poligon::zapisz_pojazdy()
 	int nr_wiersza=1;
 	for(int i=0;i<piesi.pieszy.size();i++)
 	{
-		
+
 		//duchy olewamy!
 		if(piesi.pieszy[i].trajektoria.rodzaj.duch==true) continue;
 		//sprawdzenie czy w ogole by³y pojazdy
@@ -2007,17 +2081,19 @@ void Poligon::zapisz_pojazdy()
 				sheet->Cell(nr_wiersza,22)->Set(roundToNearest(piesi.pieszy[i].pojazdy.lp.pozycja_pojazdu_w_punkcie_minimalnej_odleglosci[j].x));
 				sheet->Cell(nr_wiersza,23)->Set(roundToNearest(piesi.pieszy[i].pojazdy.lp.pozycja_pojazdu_w_punkcie_minimalnej_odleglosci[j].y));
 
+				sheet->Cell(nr_wiersza,24)->Set(piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach[j].c_str());
+				/*
 				if(piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach[j]=="po palcach")
-					sheet->Cell(nr_wiersza,24)->Set("palce");
+				sheet->Cell(nr_wiersza,24)->Set("palce");
 				else
-					if(piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach[j]=="po pietach")
-						sheet->Cell(nr_wiersza,24)->Set("piety");
+				if(piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach[j]=="po pietach")
+				sheet->Cell(nr_wiersza,24)->Set("piety");
 				else
-					if(piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach[j]=="przepuszczenie?")
-						sheet->Cell(nr_wiersza,24)->Set("przepuszczenie?");
-					else
-						sheet->Cell(nr_wiersza,24)->Set("hgw");
-
+				if(piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach[j]=="przepuszczenie?")
+				sheet->Cell(nr_wiersza,24)->Set("przepuszczenie?");
+				else
+				sheet->Cell(nr_wiersza,24)->Set("hgw");
+				*/
 				Frame::Vel vp=pojazdy_lp.pojazd[piesi.pieszy[i].pojazdy.lp.nr[j]].frame[0].vel;
 				sheet->Cell(nr_wiersza,25)->Set(roundToNearest(sqrt(vp.x*vp.x+vp.y*vp.y)));
 
@@ -2102,17 +2178,19 @@ void Poligon::zapisz_pojazdy()
 				sheet->Cell(nr_wiersza,22)->Set(roundToNearest(piesi.pieszy[i].pojazdy.pp.pozycja_pojazdu_w_punkcie_minimalnej_odleglosci[j].x));
 				sheet->Cell(nr_wiersza,23)->Set(roundToNearest(piesi.pieszy[i].pojazdy.pp.pozycja_pojazdu_w_punkcie_minimalnej_odleglosci[j].y));
 
+				sheet->Cell(nr_wiersza,24)->Set(piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach[j].c_str());
+				/*
 				if(piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach[j]=="po palcach")
 					sheet->Cell(nr_wiersza,24)->Set("palce");
 				else
 					if(piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach[j]=="po pietach")
 						sheet->Cell(nr_wiersza,24)->Set("piety");
 					else
-					if(piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach[j]=="przepuszczenie?")
-						sheet->Cell(nr_wiersza,24)->Set("przepuszczenie?");
-					else
-						sheet->Cell(nr_wiersza,24)->Set("hgw");
-
+						if(piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach[j]=="przepuszczenie?")
+							sheet->Cell(nr_wiersza,24)->Set("przepuszczenie?");
+						else
+							sheet->Cell(nr_wiersza,24)->Set("hgw");
+				*/
 
 				Frame::Vel vp=pojazdy_pp.pojazd[piesi.pieszy[i].pojazdy.pp.nr[j]].frame[0].vel;
 				sheet->Cell(nr_wiersza,25)->Set(roundToNearest(sqrt(vp.x*vp.x+vp.y*vp.y)));

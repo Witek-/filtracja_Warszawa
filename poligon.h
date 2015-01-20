@@ -22,7 +22,12 @@ class Poligon
 public:
 	string sciezka_bazowa, sciezka_prawy_pas, sciezka_lewy_pas, sciezka_piesi, katalog_wyjsciowy;
 	vector<Katalog_wejsciowy> katalog_wejsciowy;
+	struct Wspolrzedne_przejscia
+	{
+		float x1, x2;
+		float y1, y2;
 
+	}wspolrzedne_przejscia;
 
 	CvRTrees forest;
 	struct Zakres_przetwarzania
