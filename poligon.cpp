@@ -772,7 +772,7 @@ int Poligon::znajdz_minimalna_odleglosc_od_pojazdow()
 
 				if(f.size()<1)
 				{
-					piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach.push_back("???");
+					piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach.push_back("blad");
 					continue;
 				}
 
@@ -783,6 +783,7 @@ int Poligon::znajdz_minimalna_odleglosc_od_pojazdow()
 
 
 				//czy samochod przejechal po palcach czy po pietach, a moze przepuscil
+
 
 				if(piesi.pieszy[i].trajektoria.kierunek.w_gore)
 				{
@@ -834,6 +835,7 @@ int Poligon::znajdz_minimalna_odleglosc_od_pojazdow()
 		}
 
 		//to samo dla prawego pasa
+
 		if(piesi.pieszy[i].pojazdy.pp.p1!=-1)
 		{
 			for(int j=piesi.pieszy[i].pojazdy.pp.p1;j<=piesi.pieszy[i].pojazdy.pp.p2;j++)
@@ -879,7 +881,7 @@ int Poligon::znajdz_minimalna_odleglosc_od_pojazdow()
 
 				if(f.size()<1)
 				{
-					piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach.push_back("???");
+					piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach.push_back("blad");
 					continue;
 				}
 
@@ -2008,7 +2010,7 @@ void Poligon::zapisz_pojazdy()
 	int nr_wiersza=1;
 	for(int i=0;i<piesi.pieszy.size();i++)
 	{
-
+		
 		//duchy olewamy!
 		if(piesi.pieszy[i].trajektoria.rodzaj.duch==true) continue;
 		//sprawdzenie czy w ogole by³y pojazdy
@@ -2081,7 +2083,10 @@ void Poligon::zapisz_pojazdy()
 				sheet->Cell(nr_wiersza,22)->Set(roundToNearest(piesi.pieszy[i].pojazdy.lp.pozycja_pojazdu_w_punkcie_minimalnej_odleglosci[j].x));
 				sheet->Cell(nr_wiersza,23)->Set(roundToNearest(piesi.pieszy[i].pojazdy.lp.pozycja_pojazdu_w_punkcie_minimalnej_odleglosci[j].y));
 
-				sheet->Cell(nr_wiersza,24)->Set(piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach[j].c_str());
+				if(j<piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach.size())
+					sheet->Cell(nr_wiersza,24)->Set(piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach[j].c_str());
+				else
+					sheet->Cell(nr_wiersza,24)->Set("?");
 				/*
 				if(piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach[j]=="po palcach")
 				sheet->Cell(nr_wiersza,24)->Set("palce");
@@ -2178,7 +2183,11 @@ void Poligon::zapisz_pojazdy()
 				sheet->Cell(nr_wiersza,22)->Set(roundToNearest(piesi.pieszy[i].pojazdy.pp.pozycja_pojazdu_w_punkcie_minimalnej_odleglosci[j].x));
 				sheet->Cell(nr_wiersza,23)->Set(roundToNearest(piesi.pieszy[i].pojazdy.pp.pozycja_pojazdu_w_punkcie_minimalnej_odleglosci[j].y));
 
-				sheet->Cell(nr_wiersza,24)->Set(piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach[j].c_str());
+				if(j<piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach.size())
+					sheet->Cell(nr_wiersza,24)->Set(piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach[j].c_str());
+				else
+					sheet->Cell(nr_wiersza,24)->Set("?");
+				
 				/*
 				if(piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach[j]=="po palcach")
 					sheet->Cell(nr_wiersza,24)->Set("palce");

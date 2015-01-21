@@ -21,7 +21,7 @@ int main( int argc, char *argv[] )
 {
 	//SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
 	//SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
-	
+
 
 	Poligon wroclawska(argv[1] );
 
