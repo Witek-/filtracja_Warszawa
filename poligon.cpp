@@ -1884,6 +1884,19 @@ void Poligon::zapisz_pojazdy()
 	e.New(1); //automatycznie tworzy 1 arkusz
 	e.RenameWorksheet("Sheet1","do wykresu");
 	BasicExcelWorksheet* sheet = e.GetWorksheet("do wykresu");
+
+	XLSFormatManager fmt_mgr(e);
+
+	ExcelFont font_black_bold;
+	font_black_bold._weight = FW_BOLD;
+	CellFormat fmt_black_bold(fmt_mgr);
+	fmt_black_bold.set_font(font_black_bold);
+	fmt_black_bold.set_wrapping(true);
+	
+	ExcelFont font_red;
+	CellFormat fmt_red(fmt_mgr);
+	font_red.set_color_index(EGA_RED);
+	fmt_red.set_font(font_red);
 	//pierwsza wersja wypisywania
 	/*
 	sheet->Cell(0,0)->SetString("lewy pas");
@@ -1993,6 +2006,12 @@ void Poligon::zapisz_pojazdy()
 	sheet->Cell(0,24)->SetString("rodzaj konfliktu");
 	sheet->Cell(0,25)->SetString("predkosc poczatkowa pojazdu");
 
+	//formatowanie wiersza naglowkowego
+	for(int c=0;c<26;c++)
+		sheet->Cell(0,c)->SetFormat(fmt_black_bold);
+	
+	
+
 	//konfiguracja wypisywania profili predkosci
 	int kolumna_startowa=28; //od tej kolumny zaczynaja sie profile
 	int kolumna_tmp=kolumna_startowa;
@@ -2061,7 +2080,13 @@ void Poligon::zapisz_pojazdy()
 				sheet->Cell(nr_wiersza,13)->Set("lewy");
 				sheet->Cell(nr_wiersza,14)->Set(j+1);
 				sheet->Cell(nr_wiersza,15)->Set(roundToNearest(piesi.pieszy[i].pojazdy.lp.minimalna_odleglosc[j]));
+				if(piesi.pieszy[i].pojazdy.lp.minimalna_odleglosc[j]<=3)
+					sheet->Cell(nr_wiersza,15)->SetFormat(fmt_red);
+
 				sheet->Cell(nr_wiersza,16)->Set(roundToNearest(piesi.pieszy[i].pojazdy.lp.predkosc_w_punkcie_minimalnej_odleglosci[j]));
+				if(piesi.pieszy[i].pojazdy.lp.predkosc_w_punkcie_minimalnej_odleglosci[j]>=6)
+					sheet->Cell(nr_wiersza,16)->SetFormat(fmt_red);
+
 				if(piesi.pieszy[i].pojazdy.lp.pozycja_pieszego_w_punkcie_minimalnej_odleglosci[j].na_pasach==true)
 					sheet->Cell(nr_wiersza,17)->Set("tak");
 				else
@@ -2159,7 +2184,13 @@ void Poligon::zapisz_pojazdy()
 				sheet->Cell(nr_wiersza,13)->Set("prawy");
 				sheet->Cell(nr_wiersza,14)->Set(j+1);
 				sheet->Cell(nr_wiersza,15)->Set(roundToNearest(piesi.pieszy[i].pojazdy.pp.minimalna_odleglosc[j]));
+					if(piesi.pieszy[i].pojazdy.pp.minimalna_odleglosc[j]<=3)
+					sheet->Cell(nr_wiersza,15)->SetFormat(fmt_red);
+
 				sheet->Cell(nr_wiersza,16)->Set(roundToNearest(piesi.pieszy[i].pojazdy.pp.predkosc_w_punkcie_minimalnej_odleglosci[j]));
+					if(piesi.pieszy[i].pojazdy.pp.predkosc_w_punkcie_minimalnej_odleglosci[j]>=6)
+					sheet->Cell(nr_wiersza,16)->SetFormat(fmt_red);
+
 				if(piesi.pieszy[i].pojazdy.pp.pozycja_pieszego_w_punkcie_minimalnej_odleglosci[j].na_pasach==true)
 					sheet->Cell(nr_wiersza,17)->Set("tak");
 				else

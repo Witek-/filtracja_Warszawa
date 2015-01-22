@@ -15,12 +15,27 @@
 #include <cmath>
 
 #include "pugixml.hpp"
-//#include "BasicExcel.hpp"
+#include "ExcelFormat.h"
 
-
+using namespace ExcelFormat;
 using namespace std;
 using namespace pugi;
-using namespace YExcel;
+
+#ifdef _WIN32
+
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <shellapi.h>
+#include <crtdbg.h>
+
+#else // _WIN32
+
+#define	FW_NORMAL	400
+#define	FW_BOLD		700
+
+#endif // _WIN32
+
+
 
 extern fstream plik_wy;
 

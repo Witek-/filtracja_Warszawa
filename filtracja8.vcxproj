@@ -89,6 +89,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BasicExcel.cpp" />
+    <ClCompile Include="ExcelFormat.cpp" />
     <ClCompile Include="filtracja.cpp" />
     <ClCompile Include="filtracja8.cpp" />
     <ClCompile Include="piesi.cpp" />
@@ -101,6 +102,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BasicExcel.hpp" />
+    <ClInclude Include="ExcelFormat.h" />
     <ClInclude Include="filtracja.h" />
     <ClInclude Include="piesi.h" />
     <ClInclude Include="pieszy.h" />

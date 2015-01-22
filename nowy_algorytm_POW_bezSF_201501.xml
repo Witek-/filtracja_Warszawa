@@ -14,17 +14,17 @@
       <!--z progami 19.10-25.11-->
       <!--deinstalacja progow 26.11-->
       <!--bez progow 27.11-15.12-->
-      <poczatek></poczatek>
-      <koniec></koniec>
+      <poczatek>20131111</poczatek>
+      <koniec>20131129</koniec>
       <!--albo konkretnymi datami - wowczas zakres musi byc pusty!-->
-      <nazwa>na_z_SF</nazwa>
-      <daty>20131017</daty>
+      <nazwa>POW_bezSF_3_6</nazwa>
+      <daty></daty>
     </zakres_przetwarzania>
     <sciezka_bazowa>D:\mobis\wroclawska\najnowsze\POW</sciezka_bazowa>
     <prawy_pas>l1</prawy_pas>
     <lewy_pas>l2</lewy_pas>
     <piesi>hum</piesi>
-    <nazwa_katalogu_wyjsciowego>07.01 1 POW_odl_pred 3 6</nazwa_katalogu_wyjsciowego>
+    <nazwa_katalogu_wyjsciowego>POW_bezSF_odl_pred 3 6</nazwa_katalogu_wyjsciowego>
   </ustawienia>
   <statystyki_dodatkowe>
     <predkosc_pojazdow_w_punkcie>
