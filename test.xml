@@ -15,16 +15,17 @@
       <!--deinstalacja progow 26.11-->
       <!--bez progow 27.11-15.12-->
       <poczatek>20131111</poczatek>
-      <koniec>20131129</koniec>
+      <koniec>20131112</koniec>
       <!--albo konkretnymi datami - wowczas zakres musi byc pusty!-->
-      <nazwa>POW_bezSF_3_6</nazwa>
+      <nazwa>test</nazwa>
       <daty></daty>
     </zakres_przetwarzania>
     <sciezka_bazowa>D:\mobis\wroclawska\najnowsze\POW</sciezka_bazowa>
+    <liczba_pasow>2</liczba_pasow>
     <prawy_pas>l1</prawy_pas>
     <lewy_pas>l2</lewy_pas>
     <piesi>hum</piesi>
-    <nazwa_katalogu_wyjsciowego>POW_bezSF_odl_pred 3 6</nazwa_katalogu_wyjsciowego>
+    <nazwa_katalogu_wyjsciowego>katalog_test</nazwa_katalogu_wyjsciowego>
   </ustawienia>
   <statystyki_dodatkowe>
     <predkosc_pojazdow_w_punkcie>
@@ -47,8 +48,8 @@
   <w_wynikach_filtracji_maja_byc>
     <niepoprawne>nie</niepoprawne>
     <poprawne>nie</poprawne>
-    <konflikty_odleglosc>tak</konflikty_odleglosc>
+    <konflikty_odleglosc>nie</konflikty_odleglosc>
     <konflikty_hamowanie>nie</konflikty_hamowanie>
-    <wszystko>nie</wszystko>
+    <wszystko>tak</wszystko>
   </w_wynikach_filtracji_maja_byc>
 </filtracja>

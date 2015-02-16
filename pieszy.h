@@ -35,7 +35,9 @@ public:
 			float w_pionie;
 			float w_poziomie;
 			float calkowita;
-			Dlugosc() : efektywna(0), w_pionie(0), w_poziomie(0), calkowita(0) {}
+			float na_jezdni_calkowita;
+			float na_jezdni_efektywna;
+			Dlugosc() : efektywna(0), w_pionie(0), w_poziomie(0), calkowita(0), na_jezdni_calkowita(0), na_jezdni_efektywna(0) {}
 		}dlugosc;
 		struct Pozycja
 		{
@@ -46,7 +48,17 @@ public:
 				float srednia; 
 				Pozioma() : minimalna(9999), maksymalna(-9999), srednia(0) {}
 			}pozioma;
+			struct Pionowa
+			{
+				float minimalna;
+				float maksymalna;
+				float srednia; 
+				Pionowa() : minimalna(9999), maksymalna(-9999), srednia(0) {}
+			}pionowa;
 		}pozycja;
+
+		
+		
 
 		struct Predkosc
 		{

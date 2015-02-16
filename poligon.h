@@ -21,6 +21,7 @@ class Poligon
 {
 public:
 	string sciezka_bazowa, sciezka_prawy_pas, sciezka_lewy_pas, sciezka_piesi, katalog_wyjsciowy;
+	int liczba_pasow;
 	vector<Katalog_wejsciowy> katalog_wejsciowy;
 	struct Wspolrzedne_przejscia
 	{

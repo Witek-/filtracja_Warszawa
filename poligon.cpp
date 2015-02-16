@@ -84,6 +84,7 @@ Poligon::Poligon(string xml)
 
 
 	sciezka_bazowa = object.child_value("sciezka_bazowa");
+	liczba_pasow = atoi(object.child_value("liczba_pasow"));
 	sciezka_prawy_pas = object.child_value("prawy_pas");
 	sciezka_lewy_pas = object.child_value("lewy_pas");
 	sciezka_piesi = object.child_value("piesi");
@@ -93,22 +94,21 @@ Poligon::Poligon(string xml)
 	//wpisanie wspolrzednych - na razie z palca, nie z pliku
 	if(sciezka_bazowa.find("POW")!=std::string::npos)
 	{
-		wspolrzedne_przejscia.x1=-2.0; 
-		wspolrzedne_przejscia.x2=2.0; 
-		wspolrzedne_przejscia.y1=9.0; 
+		wspolrzedne_przejscia.x1=-2.0;
+		wspolrzedne_przejscia.x2=2.0;
+		wspolrzedne_przejscia.y1=9.0;
 		wspolrzedne_przejscia.y2=wspolrzedne_przejscia.y1+5.5;
 	}
 	else
 		if(sciezka_bazowa.find("RAD")!=std::string::npos)
 		{
-			wspolrzedne_przejscia.x1=-2.0; 
-			wspolrzedne_przejscia.x2=2.0; 
-			wspolrzedne_przejscia.y2=0.5; 
+			wspolrzedne_przejscia.x1=-2.0;
+			wspolrzedne_przejscia.x2=2.0;
+			wspolrzedne_przejscia.y2=0.5;
 			wspolrzedne_przejscia.y2=wspolrzedne_przejscia.y1+5.5;
 		}
 		else
 		{
-
 			cout <<"Zla nazwa poligonu (dopuszczalne POW i RAD), nacisnij ENTER by zakonczyc"<< endl;
 			cin.ignore(1);
 			exit(-1);
@@ -261,22 +261,43 @@ void Poligon::sprawdz_katalogi_danych()
 					if (found2.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)	lkp++;
 				} while (FindNextFileA(hfind2, &found2) != 0);
 
-				if(lkp==3) //znaleziono 3 podkatalogi
+				if(lkp==liczba_pasow+1) //jest ok, znaleziono o 1 wiecej katalogow (hum) niz jest pasow 
 				{
-					//sprawdzenie czy znalezione 3 podkatalogi s¹ poprawne (bez sprawdzania ich zawartoœci!
-					if(FindFirstFileA((katalog_wejsciowy[i].nazwa+"/"+sciezka_lewy_pas).c_str(),&found2)==INVALID_HANDLE_VALUE ||
-						FindFirstFileA((katalog_wejsciowy[i].nazwa+"/"+sciezka_prawy_pas).c_str(),&found2)==INVALID_HANDLE_VALUE ||
-						FindFirstFileA((sciezka_bazowa+"/"+found.cFileName+"/"+sciezka_piesi).c_str(),&found2)==INVALID_HANDLE_VALUE)
+					if(lkp==3) //znaleziono 3 podkatalogi
 					{
-						cout << "\nW katalogu " <<katalog_wejsciowy[i].nazwa<< " nie znaleziono przynajmniej 1 podkatalogu z danymi\nNacisnij Enter by zakonczyc program";
-						cin.ignore(1);
-						exit(1);
+						//sprawdzenie czy znalezione 3 podkatalogi s¹ poprawne (bez sprawdzania ich zawartoœci!
+						if(FindFirstFileA((katalog_wejsciowy[i].nazwa+"/"+sciezka_lewy_pas).c_str(),&found2)==INVALID_HANDLE_VALUE ||
+							FindFirstFileA((katalog_wejsciowy[i].nazwa+"/"+sciezka_prawy_pas).c_str(),&found2)==INVALID_HANDLE_VALUE ||
+							FindFirstFileA((sciezka_bazowa+"/"+found.cFileName+"/"+sciezka_piesi).c_str(),&found2)==INVALID_HANDLE_VALUE)
+						{
+							cout << "\nW katalogu " <<katalog_wejsciowy[i].nazwa<< " nie znaleziono przynajmniej 1 podkatalogu z danymi\nNacisnij Enter by zakonczyc program";
+							cin.ignore(1);
+							exit(1);
+						}
 					}
-				}
+					else
+						if(lkp==2) //znaleziono 2 podkatalogi
+						{
+							//sprawdzenie czy znalezione 2 podkatalogi s¹ poprawne (bez sprawdzania ich zawartoœci!
+							if(FindFirstFileA((katalog_wejsciowy[i].nazwa+"/"+sciezka_prawy_pas).c_str(),&found2)==INVALID_HANDLE_VALUE ||
+								FindFirstFileA((sciezka_bazowa+"/"+found.cFileName+"/"+sciezka_piesi).c_str(),&found2)==INVALID_HANDLE_VALUE)
+							{
+								cout << "\nW katalogu " <<katalog_wejsciowy[i].nazwa<< " nie znaleziono przynajmniej 1 podkatalogu z danymi\nNacisnij Enter by zakonczyc program";
+								cin.ignore(1);
+								exit(1);
+							}
+						}
 
+						else
+						{
+							cout << "\nKatalog " <<katalog_wejsciowy[i].nazwa<< " nie zawiera "<< liczba_pasow+1 <<" podkatalogow z danymi\nNacisnij Enter by zakonczyc program";
+							cin.ignore(1);
+							exit(1);
+						}
+				}
 				else
 				{
-					cout << "\nKatalog " <<katalog_wejsciowy[i].nazwa<< " nie zawiera 3 podkatalogow z danymi\nNacisnij Enter by zakonczyc program";
+					cout << "\nKatalog " <<katalog_wejsciowy[i].nazwa<< " zawiera inna liczbe podkatalogow z danymi niz powinien\nNacisnij Enter by zakonczyc program";
 					cin.ignore(1);
 					exit(1);
 				}
@@ -322,8 +343,10 @@ void Poligon::licz_pliki_do_zaladowania()
 	for(int i=0;i<katalog_wejsciowy.size();i++)
 	{
 		if(katalog_wejsciowy[i].przetwarzac==false) continue;
-		katalog_wejsciowy[i].licznik_pp = pojazdy_pp.licz_pliki_w_katalogu(katalog_wejsciowy[i].nazwa+"/"+sciezka_prawy_pas+"/");
-		katalog_wejsciowy[i].licznik_lp = pojazdy_lp.licz_pliki_w_katalogu(katalog_wejsciowy[i].nazwa+"/"+sciezka_lewy_pas+"/");
+		if(liczba_pasow==1 || liczba_pasow==2)
+			katalog_wejsciowy[i].licznik_pp = pojazdy_pp.licz_pliki_w_katalogu(katalog_wejsciowy[i].nazwa+"/"+sciezka_prawy_pas+"/");
+		if(liczba_pasow==2)
+			katalog_wejsciowy[i].licznik_lp = pojazdy_lp.licz_pliki_w_katalogu(katalog_wejsciowy[i].nazwa+"/"+sciezka_lewy_pas+"/");
 		katalog_wejsciowy[i].licznik_pieszych = piesi.licz_pliki_w_katalogu(katalog_wejsciowy[i].nazwa+"/"+sciezka_piesi+"/");
 		cout << "\rZliczanie plikow do zaladowania..." << setw(3) <<100*(i+1)/k<<"%";
 
@@ -350,8 +373,11 @@ int Poligon::wczytaj_dane()
 	else
 		cout << "Zakres dat: "<< zakres_przetwarzania.daty[0] << " - " << zakres_przetwarzania.daty[zakres_przetwarzania.daty.size()-1] << endl;
 	cout<<"\nLiczba obiektow do zaladowania:";
-	cout<<"\nPojazdy, prawy pas: "<<pojazdy_pp.liczba_plikow_do_zaladowania;
-	cout<<"\nPojazdy, lewy pas: "<<pojazdy_lp.liczba_plikow_do_zaladowania;
+	if(liczba_pasow==1 || liczba_pasow==2)
+		cout<<"\nPojazdy, prawy pas: "<<pojazdy_pp.liczba_plikow_do_zaladowania;
+	if(liczba_pasow==2)
+		cout<<"\nPojazdy, lewy pas: "<<pojazdy_lp.liczba_plikow_do_zaladowania;
+
 	cout<<"\nPiesi: "<<piesi.liczba_plikow_do_zaladowania;
 	cout<<"\n\nWczytywanie danych...to moze chwile potrwac\n";
 	//wersja rownolegla
@@ -359,23 +385,25 @@ int Poligon::wczytaj_dane()
 	{ 
 #pragma omp section 
 		{
-			for(int i=0;i<katalog_wejsciowy.size();i++)
-				if(katalog_wejsciowy[i].przetwarzac==true)
-					if(sciezka_bazowa.find("POW")!=std::string::npos)
-						pojazdy_pp.laduj(katalog_wejsciowy[i].nazwa+"/"+sciezka_prawy_pas+"/",true);
-					else
-						pojazdy_pp.laduj(katalog_wejsciowy[i].nazwa+"/"+sciezka_prawy_pas+"/",false);
+			if(liczba_pasow==1 || liczba_pasow==2)
+				for(int i=0;i<katalog_wejsciowy.size();i++)
+					if(katalog_wejsciowy[i].przetwarzac==true)
+						if(sciezka_bazowa.find("POW")!=std::string::npos || sciezka_bazowa.find("CEN")!=std::string::npos || sciezka_bazowa.find("SWO")!=std::string::npos)
+							pojazdy_pp.laduj(katalog_wejsciowy[i].nazwa+"/"+sciezka_prawy_pas+"/",true);
+						else
+							pojazdy_pp.laduj(katalog_wejsciowy[i].nazwa+"/"+sciezka_prawy_pas+"/",false);
 			//cout<<"\nWczytano dane dla pojazdow z prawego pasa";
 		}
 
 #pragma omp section 
 		{
-			for(int i=0;i<katalog_wejsciowy.size();i++)
-				if(katalog_wejsciowy[i].przetwarzac==true)
-					if(sciezka_bazowa.find("POW")!=std::string::npos)
-						pojazdy_lp.laduj(katalog_wejsciowy[i].nazwa+"/"+sciezka_lewy_pas+"/",true);
-					else
-						pojazdy_lp.laduj(katalog_wejsciowy[i].nazwa+"/"+sciezka_lewy_pas+"/",false);
+			if(liczba_pasow==2)
+				for(int i=0;i<katalog_wejsciowy.size();i++)
+					if(katalog_wejsciowy[i].przetwarzac==true)
+						if(sciezka_bazowa.find("POW")!=std::string::npos || sciezka_bazowa.find("CEN")!=std::string::npos || sciezka_bazowa.find("SWO")!=std::string::npos)
+							pojazdy_lp.laduj(katalog_wejsciowy[i].nazwa+"/"+sciezka_lewy_pas+"/",true);
+						else
+							pojazdy_lp.laduj(katalog_wejsciowy[i].nazwa+"/"+sciezka_lewy_pas+"/",false);
 
 			//cout<<"\nWczytano dane dla pojazdow z lewego pasa";
 		}
@@ -388,55 +416,20 @@ int Poligon::wczytaj_dane()
 		}
 #pragma omp section 
 		{
-			while(piesi.liczba_plikow_zaladowanych!=piesi.liczba_plikow_do_zaladowania)
+			while(piesi.liczba_plikow_zaladowanych!=piesi.liczba_plikow_do_zaladowania
+				|| pojazdy_pp.liczba_plikow_zaladowanych!=pojazdy_pp.liczba_plikow_do_zaladowania
+				||pojazdy_lp.liczba_plikow_zaladowanych!=pojazdy_lp.liczba_plikow_do_zaladowania)
 			{
 				Sleep(200);
 				cout << "\rPojazdy, prawy pas: " << setw(3) <<100*pojazdy_pp.liczba_plikow_zaladowanych/pojazdy_pp.liczba_plikow_do_zaladowania <<"%";
-				cout << " Pojazdy, lewy pas: " << setw(3) <<100*pojazdy_lp.liczba_plikow_zaladowanych/pojazdy_lp.liczba_plikow_do_zaladowania<<"%";
+				if(liczba_pasow==2)
+					cout << " Pojazdy, lewy pas: " << setw(3) <<100*pojazdy_lp.liczba_plikow_zaladowanych/pojazdy_lp.liczba_plikow_do_zaladowania<<"%";
 				cout << " Piesi: " << setw(3) <<100*piesi.liczba_plikow_zaladowanych/piesi.liczba_plikow_do_zaladowania<<"%";
 			}
 
 		}
 	}
 
-
-
-	//wersja sekwencyjna
-
-	//#pragma omp parallel sections
-	//	{ 
-	//#pragma omp section 
-	//		{
-	//			for(int i=0;i<katalog_wejsciowy.size();i++)
-	//				if(katalog_wejsciowy[i].przetwarzac==true)
-	//					pojazdy_pp.laduj(katalog_wejsciowy[i].nazwa+"/"+sciezka_prawy_pas+"/");
-	//
-	//			//cout<<"\nWczytano dane dla pojazdow z prawego pasa";
-	//
-	//			for(int i=0;i<katalog_wejsciowy.size();i++)
-	//				if(katalog_wejsciowy[i].przetwarzac==true)
-	//					pojazdy_lp.laduj(katalog_wejsciowy[i].nazwa+"/"+sciezka_lewy_pas+"/");
-	//
-	//			//cout<<"\nWczytano dane dla pojazdow z lewego pasa";
-	//
-	//			for(int i=0;i<katalog_wejsciowy.size();i++)
-	//				if(katalog_wejsciowy[i].przetwarzac==true)
-	//					piesi.laduj(katalog_wejsciowy[i].nazwa+"/"+sciezka_piesi+"/");
-	//
-	//			//cout<<"\nWczytano dane dla pieszych";
-	//		}
-	//#pragma omp section 
-	//		{
-	//			while(piesi.liczba_plikow_zaladowanych!=piesi.liczba_plikow_do_zaladowania)
-	//			{
-	//				Sleep(200);
-	//				cout << "\rPojazdy, prawy pas: " << setw(3) <<100*pojazdy_pp.liczba_plikow_zaladowanych/pojazdy_pp.liczba_plikow_do_zaladowania <<"%";
-	//				cout << " Pojazdy, lewy pas: " << setw(3) <<100*pojazdy_lp.liczba_plikow_zaladowanych/pojazdy_lp.liczba_plikow_do_zaladowania<<"%";
-	//				cout << " Piesi: " << setw(3) <<100*piesi.liczba_plikow_zaladowanych/piesi.liczba_plikow_do_zaladowania<<"%";
-	//			}
-	//
-	//		}
-	//	}
 
 	return 1;
 }
@@ -447,7 +440,7 @@ int Poligon::analizuj_trajektorie_pieszych()
 	//int licznik=0;
 
 
-#pragma omp parallel for
+	//#pragma omp parallel for
 	for(int i=0;i<piesi.pieszy.size();i++)
 	{
 		Pieszy *p=&piesi.pieszy[i];
@@ -498,6 +491,7 @@ int Poligon::analizuj_trajektorie_pieszych()
 				p->trajektoria.wspolczynnik_drgan_w_poziomie++;
 
 
+
 		//dodatkowe parametry
 		//analiza trajektorii
 
@@ -508,6 +502,10 @@ int Poligon::analizuj_trajektorie_pieszych()
 			if(p->frame[l].pos.x<p->trajektoria.pozycja.pozioma.minimalna) p->trajektoria.pozycja.pozioma.minimalna=p->frame[l].pos.x;
 			if(p->frame[l].pos.x>p->trajektoria.pozycja.pozioma.maksymalna) p->trajektoria.pozycja.pozioma.maksymalna=p->frame[l].pos.x;
 			p->trajektoria.pozycja.pozioma.srednia+=p->frame[l].pos.x;
+
+			if(p->frame[l].pos.y<p->trajektoria.pozycja.pionowa.minimalna) p->trajektoria.pozycja.pionowa.minimalna=p->frame[l].pos.y;
+			if(p->frame[l].pos.y>p->trajektoria.pozycja.pionowa.maksymalna) p->trajektoria.pozycja.pionowa.maksymalna=p->frame[l].pos.y;
+			p->trajektoria.pozycja.pionowa.srednia+=p->frame[l].pos.y;
 
 			//pieszy musi byæ na pasach; 
 			if(p->frame[l].pos.y>=wspolrzedne_przejscia.y1 && p->frame[l].pos.y<=wspolrzedne_przejscia.y2)
@@ -531,6 +529,7 @@ int Poligon::analizuj_trajektorie_pieszych()
 			p->trajektoria.predkosc.srednia=0;
 
 		p->trajektoria.pozycja.pozioma.srednia/=p->frame.size();
+		p->trajektoria.pozycja.pionowa.srednia/=p->frame.size();
 
 		//teraz liczenie wariancji prêdkoœci pieszego
 		float wariancja=0;
@@ -542,6 +541,7 @@ int Poligon::analizuj_trajektorie_pieszych()
 				wariancja+=(predkosc_chwilowa-p->trajektoria.predkosc.srednia)*(predkosc_chwilowa-p->trajektoria.predkosc.srednia);
 				licznik_zliczen++;
 			}
+
 			if(licznik_zliczen>0)
 				wariancja/=licznik_zliczen;
 			else
@@ -556,6 +556,26 @@ int Poligon::analizuj_trajektorie_pieszych()
 			//na podstawie przebytej odleg³oœci l czasu
 			float t=(p->t2-p->t1)*24*60*60;
 			p->trajektoria.predkosc.srednia_z_pozycji=p->trajektoria.dlugosc.calkowita/t;
+
+
+
+			//dlugosc efektywna i calkowita trajektorii pieszego na ulicy - czesc chodnikowa jest pomijana
+			int ulica1=-1, ulica2=-1;	
+			for(int l=0;l<p->frame.size();l++)
+			{
+				//poszukiwanie pierwszej i ostatniej klatki na ulicy
+				if(ulica1==-1 && p->frame[l].pos.na_pasach==true) //nie znaleziono jeszcze ramki wejscia pieszego na ulice i wlasnie wlazl
+					ulica1=l;
+				if(ulica1!=-1 && p->frame[l].pos.na_pasach==true) //i caly czas jest
+					ulica2=l;
+			}
+			if(ulica1!=-1)
+			{
+				p->trajektoria.dlugosc.na_jezdni_efektywna=abs(sqrt( (p->frame[ulica1].pos.x-p->frame[ulica2].pos.x)*(p->frame[ulica1].pos.x-p->frame[ulica2].pos.x) + (p->frame[ulica1].pos.y-p->frame[ulica2].pos.y)*(p->frame[ulica1].pos.y-p->frame[ulica2].pos.y) ));
+				for(int l=ulica1+1;l<=ulica2;l++)
+					p->trajektoria.dlugosc.na_jezdni_calkowita+=abs(sqrt((p->frame[l].pos.x-p->frame[l-1].pos.x)*(p->frame[l].pos.x-p->frame[l-1].pos.x) + (p->frame[l].pos.y-p->frame[l-1].pos.y)*(p->frame[l].pos.y-p->frame[l-1].pos.y) ));
+			}
+
 	}
 
 
@@ -742,7 +762,7 @@ int Poligon::znajdz_minimalna_odleglosc_od_pojazdow()
 				float predkosc=999;
 				Frame::Pos pozycja_pieszego_min; //w punkcie minimalnej odleglosci
 				Frame::Pos pozycja_pojazdu_min; //w punkcie minimalnej odleglosci
-				
+
 
 				for(int k=0;k<f.size();k++)
 				{
@@ -847,12 +867,12 @@ int Poligon::znajdz_minimalna_odleglosc_od_pojazdow()
 				vector<Frame> g;
 				set_intersection(piesi.pieszy[i].frame.begin(), piesi.pieszy[i].frame.end(),f.begin(), f.end(),back_inserter(g));
 
-				
+
 				float odleglosc=999;
 				float predkosc=999;
 				Frame::Pos pozycja_pieszego_min; //w punkcie minimalnej odleglosci
 				Frame::Pos pozycja_pojazdu_min; //w punkcie minimalnej odleglosci
-		
+
 
 				for(int k=0;k<f.size();k++)
 				{
@@ -1892,7 +1912,7 @@ void Poligon::zapisz_pojazdy()
 	CellFormat fmt_black_bold(fmt_mgr);
 	fmt_black_bold.set_font(font_black_bold);
 	fmt_black_bold.set_wrapping(true);
-	
+
 	ExcelFont font_red;
 	CellFormat fmt_red(fmt_mgr);
 	font_red.set_color_index(EGA_RED);
@@ -1972,10 +1992,10 @@ void Poligon::zapisz_pojazdy()
 
 	//druga wersja wypisywania
 	sheet->Cell(0,0)->SetString("ponizej przykladowa sciezka bazowa do danych");
-	sheet->Cell(1,0)->SetString("D:\\mobis\\wroclawska\\najnowsze\\POW");
+	sheet->Cell(1,0)->SetString("D:\\mobis\\mickiewicza_cen\\najnowsze\\POW");
 	sheet->Cell(2,0)->SetString("Aby moc klikac na nazwy filmikow nalezy");
 	sheet->Cell(3,0)->SetString("zaznaczyc kolumne B i zamienic w niej");
-	sheet->Cell(4,0)->SetString("XXX   na    =HIPERLACZE(\"D:\\mobis\\wroclawska\\najnowsze\\POW");
+	sheet->Cell(4,0)->SetString("XXX   na    =HIPERLACZE(\"D:\\mobis\\mickiewicza_cen\\najnowsze\\POW");
 	sheet->Cell(5,0)->SetString("WPISAC POLSKIE ZNAKI I WLASNA SCIEZKE!!!");
 	sheet->Cell(5,0)->SetString("po zmianie mozna skasowac kolumne A");
 	sheet->Cell(0,1)->SetString("nazwa pliku z pieszym");
@@ -2009,8 +2029,8 @@ void Poligon::zapisz_pojazdy()
 	//formatowanie wiersza naglowkowego
 	for(int c=0;c<26;c++)
 		sheet->Cell(0,c)->SetFormat(fmt_black_bold);
-	
-	
+
+
 
 	//konfiguracja wypisywania profili predkosci
 	int kolumna_startowa=28; //od tej kolumny zaczynaja sie profile
@@ -2029,7 +2049,7 @@ void Poligon::zapisz_pojazdy()
 	int nr_wiersza=1;
 	for(int i=0;i<piesi.pieszy.size();i++)
 	{
-		
+
 		//duchy olewamy!
 		if(piesi.pieszy[i].trajektoria.rodzaj.duch==true) continue;
 		//sprawdzenie czy w ogole by³y pojazdy
@@ -2184,11 +2204,11 @@ void Poligon::zapisz_pojazdy()
 				sheet->Cell(nr_wiersza,13)->Set("prawy");
 				sheet->Cell(nr_wiersza,14)->Set(j+1);
 				sheet->Cell(nr_wiersza,15)->Set(roundToNearest(piesi.pieszy[i].pojazdy.pp.minimalna_odleglosc[j]));
-					if(piesi.pieszy[i].pojazdy.pp.minimalna_odleglosc[j]<=3)
+				if(piesi.pieszy[i].pojazdy.pp.minimalna_odleglosc[j]<=3)
 					sheet->Cell(nr_wiersza,15)->SetFormat(fmt_red);
 
 				sheet->Cell(nr_wiersza,16)->Set(roundToNearest(piesi.pieszy[i].pojazdy.pp.predkosc_w_punkcie_minimalnej_odleglosci[j]));
-					if(piesi.pieszy[i].pojazdy.pp.predkosc_w_punkcie_minimalnej_odleglosci[j]>=6)
+				if(piesi.pieszy[i].pojazdy.pp.predkosc_w_punkcie_minimalnej_odleglosci[j]>=6)
 					sheet->Cell(nr_wiersza,16)->SetFormat(fmt_red);
 
 				if(piesi.pieszy[i].pojazdy.pp.pozycja_pieszego_w_punkcie_minimalnej_odleglosci[j].na_pasach==true)
@@ -2218,18 +2238,18 @@ void Poligon::zapisz_pojazdy()
 					sheet->Cell(nr_wiersza,24)->Set(piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach[j].c_str());
 				else
 					sheet->Cell(nr_wiersza,24)->Set("?");
-				
+
 				/*
 				if(piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach[j]=="po palcach")
-					sheet->Cell(nr_wiersza,24)->Set("palce");
+				sheet->Cell(nr_wiersza,24)->Set("palce");
 				else
-					if(piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach[j]=="po pietach")
-						sheet->Cell(nr_wiersza,24)->Set("piety");
-					else
-						if(piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach[j]=="przepuszczenie?")
-							sheet->Cell(nr_wiersza,24)->Set("przepuszczenie?");
-						else
-							sheet->Cell(nr_wiersza,24)->Set("hgw");
+				if(piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach[j]=="po pietach")
+				sheet->Cell(nr_wiersza,24)->Set("piety");
+				else
+				if(piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach[j]=="przepuszczenie?")
+				sheet->Cell(nr_wiersza,24)->Set("przepuszczenie?");
+				else
+				sheet->Cell(nr_wiersza,24)->Set("hgw");
 				*/
 
 				Frame::Vel vp=pojazdy_pp.pojazd[piesi.pieszy[i].pojazdy.pp.nr[j]].frame[0].vel;
