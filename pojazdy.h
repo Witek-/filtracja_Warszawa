@@ -16,6 +16,8 @@ public:
 	int liczba_pojazdow_z_dziurami;
 	int liczba_pojazdow_z_dala_od_pasow;
 
+	
+
 	Pojazdy();
 	int licz_pliki_w_katalogu(string sciezka);
 	/// <summary>

@@ -48,6 +48,7 @@ public:
 		Acc() : max_x(-999),min_x(999), max_y(-999), min_y(999), w_punkcie(-999) {}
 	} acc;
 
+
 	Pojazd();
 	/// <summary>
 	///  £aduje dane pojazdu z pliku z opcjonaln¹ normalizacj¹ prêdkoœci i przyspieszenia dla kierunku z negatywnymi pozycjami
@@ -57,7 +58,7 @@ public:
 	///Wyznacza skrajne wartoœci prêdkoœci i przyspieszenia 
 	int analizuj_predkosc(float odl_min, float odl_max, float w_punkcie);
 	void wyswietlStempleCzasowe();
-
+	
 
 
 };

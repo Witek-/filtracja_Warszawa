@@ -7,25 +7,25 @@
       <!--instalacja SignFlash 16.10-->
       <!--z SignFlash 17.10-11.11-->
       <!--deinstalacja SignFlash 12.11-->
-      <!--bez SignFlash 12.11-13.12-->
+      <!--bez SignFlash 13.11-13.12-->
       <!--RAD-->
-      <!--przed progami brak-->
+      <!--przed progami 17.10-->
       <!--instalacja progow 18.10-->
       <!--z progami 19.10-25.11-->
       <!--deinstalacja progow 26.11-->
       <!--bez progow 27.11-15.12-->
-      <poczatek>20131111</poczatek>
-      <koniec>20131112</koniec>
+      <poczatek></poczatek>
+      <koniec></koniec>
       <!--albo konkretnymi datami - wowczas zakres musi byc pusty!-->
-      <nazwa>test</nazwa>
-      <daty></daty>
+      <nazwa>SF_3_6</nazwa>
+      <daty>20131113 20131114 20131115 20131116 20131117 20131118 20131119 20131120 20131121 20131122 20131127 20131128 20131129</daty>
     </zakres_przetwarzania>
     <sciezka_bazowa>D:\mobis\wroclawska\najnowsze\POW</sciezka_bazowa>
     <liczba_pasow>2</liczba_pasow>
     <prawy_pas>l1</prawy_pas>
     <lewy_pas>l2</lewy_pas>
     <piesi>hum</piesi>
-    <nazwa_katalogu_wyjsciowego>katalog_test</nazwa_katalogu_wyjsciowego>
+    <nazwa_katalogu_wyjsciowego>zSF_bez_cieni</nazwa_katalogu_wyjsciowego>
   </ustawienia>
   <statystyki_dodatkowe>
     <predkosc_pojazdow_w_punkcie>

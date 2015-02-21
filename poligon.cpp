@@ -1,5 +1,13 @@
 #include"poligon.h"
 
+
+extern struct Wspolrzedne_przejscia
+	{
+		float x1, x2;
+		float y1, y2;
+
+	}wp;
+
 const double INF = 1.e100;
 
 double roundToNearest(double num) {
@@ -51,7 +59,7 @@ Poligon::Poligon(string xml)
 		exit(-1);
 	}
 
-
+	
 	//odczyt sciezek
 
 	xml_node object = doc.child("filtracja").child("ustawienia");
@@ -113,6 +121,14 @@ Poligon::Poligon(string xml)
 			cin.ignore(1);
 			exit(-1);
 		}
+
+		//zmiennq globalna aby wygodny dostep miala funkcja analizy trajektorii samochodow
+		wp.x1=wspolrzedne_przejscia.x1;
+		wp.x2=wspolrzedne_przejscia.x2;
+		wp.y1=wspolrzedne_przejscia.y1;
+		wp.y2=wspolrzedne_przejscia.y2;
+			
+		
 
 
 		//odczyt operacji do wykonania
@@ -337,7 +353,7 @@ void Poligon::licz_pliki_do_zaladowania()
 	//policzenie ile jest katalogow do przetworzenia
 	int k=0;
 	for(int i=0;i<katalog_wejsciowy.size();i++)
-		if(katalog_wejsciowy[i].przetwarzac!=false) 
+		//if(katalog_wejsciowy[i].przetwarzac!=false) //pominiecie pustych katalogow falszuje procenty w zliczaniu
 			k++;
 
 	for(int i=0;i<katalog_wejsciowy.size();i++)
@@ -1104,7 +1120,7 @@ int Poligon::znajdz_maksymalne_opoznienie_pojazdow(float odl_min, float odl_max)
 
 int Poligon:: analizuj_trajektorie_pojazdow(float odl_min, float odl_max)
 {
-
+	
 	pojazdy_pp.analizuj_predkosc(odl_min, odl_max, statystyki_dodatkowe.predkosc_pojazdow_w_punkcie.wspolrzedna_x_punktu);
 	pojazdy_lp.analizuj_predkosc(odl_min, odl_max, statystyki_dodatkowe.predkosc_pojazdow_w_punkcie.wspolrzedna_x_punktu);
 	licz_pojazdy_z_dziurami_i_daleko_od_przejscia();
@@ -2013,18 +2029,26 @@ void Poligon::zapisz_pojazdy()
 	sheet->Cell(0,12)->SetString("l. poj. PP");
 	sheet->Cell(0,13)->SetString("ktory pas");
 	sheet->Cell(0,14)->SetString("nr pojazdu");
-	sheet->Cell(0,15)->SetString("odleglosc");
-	sheet->Cell(0,16)->SetString("predkosc");
-	sheet->Cell(0,17)->SetString("pieszy na pasach");
-	sheet->Cell(0,18)->SetString("kierunek ruchu pieszego");
 
-	sheet->Cell(0,19)->SetString("X pieszego");
-	sheet->Cell(0,20)->SetString("Y pieszego");
-	sheet->Cell(0,21)->SetString("pojazd na pasach");
-	sheet->Cell(0,22)->SetString("X pojazdu");
-	sheet->Cell(0,23)->SetString("Y pojazdu");
-	sheet->Cell(0,24)->SetString("rodzaj konfliktu");
-	sheet->Cell(0,25)->SetString("predkosc poczatkowa pojazdu");
+	sheet->Cell(0,15)->SetString("marka");
+	sheet->Cell(0,16)->SetString("model");
+	sheet->Cell(0,17)->SetString("rejestracja");
+
+	sheet->Cell(0,18)->SetString("odleglosc");
+	sheet->Cell(0,19)->SetString("predkosc");
+	
+	sheet->Cell(0,20)->SetString("rodzaj trajektorii");
+	
+	sheet->Cell(0,21)->SetString("pieszy na pasach");
+	sheet->Cell(0,22)->SetString("kierunek ruchu pieszego");
+
+	sheet->Cell(0,23)->SetString("X pieszego");
+	sheet->Cell(0,24)->SetString("Y pieszego");
+	sheet->Cell(0,25)->SetString("pojazd na pasach");
+	sheet->Cell(0,26)->SetString("X pojazdu");
+	sheet->Cell(0,27)->SetString("Y pojazdu");
+	sheet->Cell(0,28)->SetString("rodzaj konfliktu");
+	sheet->Cell(0,29)->SetString("predkosc poczatkowa pojazdu");
 
 	//formatowanie wiersza naglowkowego
 	for(int c=0;c<26;c++)
@@ -2033,7 +2057,7 @@ void Poligon::zapisz_pojazdy()
 
 
 	//konfiguracja wypisywania profili predkosci
-	int kolumna_startowa=28; //od tej kolumny zaczynaja sie profile
+	int kolumna_startowa=31; //od tej kolumny zaczynaja sie profile
 	int kolumna_tmp=kolumna_startowa;
 	double odla=30; //zakres odleglosci do profilu
 	double odla_tmp=odla;
@@ -2094,58 +2118,78 @@ void Poligon::zapisz_pojazdy()
 				sheet->Cell(nr_wiersza,10)->Set(piesi.pieszy[i].pojazdy.razem);
 				sheet->Cell(nr_wiersza,11)->Set(piesi.pieszy[i].pojazdy.lp.liczba);
 				sheet->Cell(nr_wiersza,12)->Set(piesi.pieszy[i].pojazdy.pp.liczba);
-
-
+				
 
 				sheet->Cell(nr_wiersza,13)->Set("lewy");
 				sheet->Cell(nr_wiersza,14)->Set(j+1);
-				sheet->Cell(nr_wiersza,15)->Set(roundToNearest(piesi.pieszy[i].pojazdy.lp.minimalna_odleglosc[j]));
-				if(piesi.pieszy[i].pojazdy.lp.minimalna_odleglosc[j]<=3)
-					sheet->Cell(nr_wiersza,15)->SetFormat(fmt_red);
 
-				sheet->Cell(nr_wiersza,16)->Set(roundToNearest(piesi.pieszy[i].pojazdy.lp.predkosc_w_punkcie_minimalnej_odleglosci[j]));
+				
+				sheet->Cell(nr_wiersza,15)->Set(pojazdy_lp.pojazd[piesi.pieszy[i].pojazdy.lp.nr[j]].manufacturer.c_str());
+				sheet->Cell(nr_wiersza,16)->Set(pojazdy_lp.pojazd[piesi.pieszy[i].pojazdy.lp.nr[j]].model.c_str());
+				sheet->Cell(nr_wiersza,17)->Set(pojazdy_lp.pojazd[piesi.pieszy[i].pojazdy.lp.nr[j]].symbol.c_str());
+
+				sheet->Cell(nr_wiersza,18)->Set(roundToNearest(piesi.pieszy[i].pojazdy.lp.minimalna_odleglosc[j]));
+				if(piesi.pieszy[i].pojazdy.lp.minimalna_odleglosc[j]<=3)
+					sheet->Cell(nr_wiersza,18)->SetFormat(fmt_red);
+
+				sheet->Cell(nr_wiersza,19)->Set(roundToNearest(piesi.pieszy[i].pojazdy.lp.predkosc_w_punkcie_minimalnej_odleglosci[j]));
 				if(piesi.pieszy[i].pojazdy.lp.predkosc_w_punkcie_minimalnej_odleglosci[j]>=6)
-					sheet->Cell(nr_wiersza,16)->SetFormat(fmt_red);
+					sheet->Cell(nr_wiersza,19)->SetFormat(fmt_red);
+
+				if(piesi.pieszy[i].trajektoria.rodzaj.dluga==true)
+					sheet->Cell(nr_wiersza,20)->Set("dluga");
+				else
+					if(piesi.pieszy[i].trajektoria.rodzaj.srednia==true)
+					sheet->Cell(nr_wiersza,20)->Set("srednia");
+					else
+				if(piesi.pieszy[i].trajektoria.rodzaj.krotka==true)
+					sheet->Cell(nr_wiersza,20)->Set("krotka");
+				else
+				if(piesi.pieszy[i].trajektoria.rodzaj.duch==true)
+					sheet->Cell(nr_wiersza,20)->Set("duch");
+				else
+					sheet->Cell(nr_wiersza,20)->Set("hgw");
+
 
 				if(piesi.pieszy[i].pojazdy.lp.pozycja_pieszego_w_punkcie_minimalnej_odleglosci[j].na_pasach==true)
-					sheet->Cell(nr_wiersza,17)->Set("tak");
-				else
-					sheet->Cell(nr_wiersza,17)->Set("nie");
-				if(piesi.pieszy[i].trajektoria.kierunek.w_gore)
-					sheet->Cell(nr_wiersza,18)->Set("gora");
-				else
-					if(piesi.pieszy[i].trajektoria.kierunek.w_dol)
-						sheet->Cell(nr_wiersza,18)->Set("dol");
-					else
-						sheet->Cell(nr_wiersza,18)->Set("hgw");
-				sheet->Cell(nr_wiersza,19)->Set(roundToNearest(piesi.pieszy[i].pojazdy.lp.pozycja_pieszego_w_punkcie_minimalnej_odleglosci[j].x));
-				sheet->Cell(nr_wiersza,20)->Set(roundToNearest(piesi.pieszy[i].pojazdy.lp.pozycja_pieszego_w_punkcie_minimalnej_odleglosci[j].y));
-
-				if(piesi.pieszy[i].pojazdy.lp.pozycja_pojazdu_w_punkcie_minimalnej_odleglosci[j].na_pasach==true)
 					sheet->Cell(nr_wiersza,21)->Set("tak");
 				else
 					sheet->Cell(nr_wiersza,21)->Set("nie");
-				sheet->Cell(nr_wiersza,22)->Set(roundToNearest(piesi.pieszy[i].pojazdy.lp.pozycja_pojazdu_w_punkcie_minimalnej_odleglosci[j].x));
-				sheet->Cell(nr_wiersza,23)->Set(roundToNearest(piesi.pieszy[i].pojazdy.lp.pozycja_pojazdu_w_punkcie_minimalnej_odleglosci[j].y));
+				if(piesi.pieszy[i].trajektoria.kierunek.w_gore)
+					sheet->Cell(nr_wiersza,22)->Set("gora");
+				else
+					if(piesi.pieszy[i].trajektoria.kierunek.w_dol)
+						sheet->Cell(nr_wiersza,22)->Set("dol");
+					else
+						sheet->Cell(nr_wiersza,22)->Set("hgw");
+				sheet->Cell(nr_wiersza,23)->Set(roundToNearest(piesi.pieszy[i].pojazdy.lp.pozycja_pieszego_w_punkcie_minimalnej_odleglosci[j].x));
+				sheet->Cell(nr_wiersza,24)->Set(roundToNearest(piesi.pieszy[i].pojazdy.lp.pozycja_pieszego_w_punkcie_minimalnej_odleglosci[j].y));
+
+				if(piesi.pieszy[i].pojazdy.lp.pozycja_pojazdu_w_punkcie_minimalnej_odleglosci[j].na_pasach==true)
+					sheet->Cell(nr_wiersza,25)->Set("tak");
+				else
+					sheet->Cell(nr_wiersza,25)->Set("nie");
+				sheet->Cell(nr_wiersza,26)->Set(roundToNearest(piesi.pieszy[i].pojazdy.lp.pozycja_pojazdu_w_punkcie_minimalnej_odleglosci[j].x));
+				sheet->Cell(nr_wiersza,27)->Set(roundToNearest(piesi.pieszy[i].pojazdy.lp.pozycja_pojazdu_w_punkcie_minimalnej_odleglosci[j].y));
 
 				if(j<piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach.size())
-					sheet->Cell(nr_wiersza,24)->Set(piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach[j].c_str());
+					sheet->Cell(nr_wiersza,28)->Set(piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach[j].c_str());
 				else
-					sheet->Cell(nr_wiersza,24)->Set("?");
+					sheet->Cell(nr_wiersza,28)->Set("?");
 				/*
 				if(piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach[j]=="po palcach")
-				sheet->Cell(nr_wiersza,24)->Set("palce");
+				sheet->Cell(nr_wiersza,28)->Set("palce");
 				else
 				if(piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach[j]=="po pietach")
-				sheet->Cell(nr_wiersza,24)->Set("piety");
+				sheet->Cell(nr_wiersza,28)->Set("piety");
 				else
 				if(piesi.pieszy[i].pojazdy.lp.po_palcach_po_pietach[j]=="przepuszczenie?")
-				sheet->Cell(nr_wiersza,24)->Set("przepuszczenie?");
+				sheet->Cell(nr_wiersza,28)->Set("przepuszczenie?");
 				else
-				sheet->Cell(nr_wiersza,24)->Set("hgw");
+				sheet->Cell(nr_wiersza,28)->Set("hgw");
 				*/
 				Frame::Vel vp=pojazdy_lp.pojazd[piesi.pieszy[i].pojazdy.lp.nr[j]].frame[0].vel;
-				sheet->Cell(nr_wiersza,25)->Set(roundToNearest(sqrt(vp.x*vp.x+vp.y*vp.y)));
+				sheet->Cell(nr_wiersza,29)->Set(roundToNearest(sqrt(vp.x*vp.x+vp.y*vp.y)));
 
 				// wypisanie profilu predkosci pojazdu co x cm od 30 metra do 0
 
@@ -2203,57 +2247,78 @@ void Poligon::zapisz_pojazdy()
 
 				sheet->Cell(nr_wiersza,13)->Set("prawy");
 				sheet->Cell(nr_wiersza,14)->Set(j+1);
-				sheet->Cell(nr_wiersza,15)->Set(roundToNearest(piesi.pieszy[i].pojazdy.pp.minimalna_odleglosc[j]));
-				if(piesi.pieszy[i].pojazdy.pp.minimalna_odleglosc[j]<=3)
-					sheet->Cell(nr_wiersza,15)->SetFormat(fmt_red);
 
-				sheet->Cell(nr_wiersza,16)->Set(roundToNearest(piesi.pieszy[i].pojazdy.pp.predkosc_w_punkcie_minimalnej_odleglosci[j]));
+				sheet->Cell(nr_wiersza,15)->Set(pojazdy_pp.pojazd[piesi.pieszy[i].pojazdy.pp.nr[j]].manufacturer.c_str());
+				sheet->Cell(nr_wiersza,16)->Set(pojazdy_pp.pojazd[piesi.pieszy[i].pojazdy.pp.nr[j]].model.c_str());
+				sheet->Cell(nr_wiersza,17)->Set(pojazdy_pp.pojazd[piesi.pieszy[i].pojazdy.pp.nr[j]].symbol.c_str());
+
+
+				sheet->Cell(nr_wiersza,18)->Set(roundToNearest(piesi.pieszy[i].pojazdy.pp.minimalna_odleglosc[j]));
+				if(piesi.pieszy[i].pojazdy.pp.minimalna_odleglosc[j]<=3)
+					sheet->Cell(nr_wiersza,18)->SetFormat(fmt_red);
+
+				sheet->Cell(nr_wiersza,19)->Set(roundToNearest(piesi.pieszy[i].pojazdy.pp.predkosc_w_punkcie_minimalnej_odleglosci[j]));
 				if(piesi.pieszy[i].pojazdy.pp.predkosc_w_punkcie_minimalnej_odleglosci[j]>=6)
-					sheet->Cell(nr_wiersza,16)->SetFormat(fmt_red);
+					sheet->Cell(nr_wiersza,19)->SetFormat(fmt_red);
+
+				if(piesi.pieszy[i].trajektoria.rodzaj.dluga==true)
+					sheet->Cell(nr_wiersza,20)->Set("dluga");
+				else
+					if(piesi.pieszy[i].trajektoria.rodzaj.srednia==true)
+					sheet->Cell(nr_wiersza,20)->Set("srednia");
+					else
+				if(piesi.pieszy[i].trajektoria.rodzaj.krotka==true)
+					sheet->Cell(nr_wiersza,20)->Set("krotka");
+				else
+				if(piesi.pieszy[i].trajektoria.rodzaj.duch==true)
+					sheet->Cell(nr_wiersza,20)->Set("duch");
+				else
+					sheet->Cell(nr_wiersza,20)->Set("hgw");
+
 
 				if(piesi.pieszy[i].pojazdy.pp.pozycja_pieszego_w_punkcie_minimalnej_odleglosci[j].na_pasach==true)
-					sheet->Cell(nr_wiersza,17)->Set("tak");
-				else
-					sheet->Cell(nr_wiersza,17)->Set("nie");
-
-				if(piesi.pieszy[i].trajektoria.kierunek.w_gore)
-					sheet->Cell(nr_wiersza,18)->Set("gora");
-				else
-					if(piesi.pieszy[i].trajektoria.kierunek.w_dol)
-						sheet->Cell(nr_wiersza,18)->Set("dol");
-					else
-						sheet->Cell(nr_wiersza,18)->Set("hgw");
-
-				sheet->Cell(nr_wiersza,19)->Set(roundToNearest(piesi.pieszy[i].pojazdy.pp.pozycja_pieszego_w_punkcie_minimalnej_odleglosci[j].x));
-				sheet->Cell(nr_wiersza,20)->Set(roundToNearest(piesi.pieszy[i].pojazdy.pp.pozycja_pieszego_w_punkcie_minimalnej_odleglosci[j].y));
-
-				if(piesi.pieszy[i].pojazdy.pp.pozycja_pojazdu_w_punkcie_minimalnej_odleglosci[j].na_pasach==true)
 					sheet->Cell(nr_wiersza,21)->Set("tak");
 				else
 					sheet->Cell(nr_wiersza,21)->Set("nie");
-				sheet->Cell(nr_wiersza,22)->Set(roundToNearest(piesi.pieszy[i].pojazdy.pp.pozycja_pojazdu_w_punkcie_minimalnej_odleglosci[j].x));
-				sheet->Cell(nr_wiersza,23)->Set(roundToNearest(piesi.pieszy[i].pojazdy.pp.pozycja_pojazdu_w_punkcie_minimalnej_odleglosci[j].y));
+
+				if(piesi.pieszy[i].trajektoria.kierunek.w_gore)
+					sheet->Cell(nr_wiersza,22)->Set("gora");
+				else
+					if(piesi.pieszy[i].trajektoria.kierunek.w_dol)
+						sheet->Cell(nr_wiersza,22)->Set("dol");
+					else
+						sheet->Cell(nr_wiersza,22)->Set("hgw");
+
+				sheet->Cell(nr_wiersza,23)->Set(roundToNearest(piesi.pieszy[i].pojazdy.pp.pozycja_pieszego_w_punkcie_minimalnej_odleglosci[j].x));
+				sheet->Cell(nr_wiersza,24)->Set(roundToNearest(piesi.pieszy[i].pojazdy.pp.pozycja_pieszego_w_punkcie_minimalnej_odleglosci[j].y));
+
+				if(piesi.pieszy[i].pojazdy.pp.pozycja_pojazdu_w_punkcie_minimalnej_odleglosci[j].na_pasach==true)
+					sheet->Cell(nr_wiersza,25)->Set("tak");
+				else
+					sheet->Cell(nr_wiersza,25)->Set("nie");
+				sheet->Cell(nr_wiersza,26)->Set(roundToNearest(piesi.pieszy[i].pojazdy.pp.pozycja_pojazdu_w_punkcie_minimalnej_odleglosci[j].x));
+				sheet->Cell(nr_wiersza,27)->Set(roundToNearest(piesi.pieszy[i].pojazdy.pp.pozycja_pojazdu_w_punkcie_minimalnej_odleglosci[j].y));
 
 				if(j<piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach.size())
-					sheet->Cell(nr_wiersza,24)->Set(piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach[j].c_str());
+					sheet->Cell(nr_wiersza,28)->Set(piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach[j].c_str());
 				else
-					sheet->Cell(nr_wiersza,24)->Set("?");
+					sheet->Cell(nr_wiersza,28)->Set("?");
 
 				/*
 				if(piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach[j]=="po palcach")
-				sheet->Cell(nr_wiersza,24)->Set("palce");
+				sheet->Cell(nr_wiersza,28)->Set("palce");
 				else
 				if(piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach[j]=="po pietach")
-				sheet->Cell(nr_wiersza,24)->Set("piety");
+				sheet->Cell(nr_wiersza,28)->Set("piety");
 				else
 				if(piesi.pieszy[i].pojazdy.pp.po_palcach_po_pietach[j]=="przepuszczenie?")
-				sheet->Cell(nr_wiersza,24)->Set("przepuszczenie?");
+				sheet->Cell(nr_wiersza,28)->Set("przepuszczenie?");
 				else
-				sheet->Cell(nr_wiersza,24)->Set("hgw");
+				sheet->Cell(nr_wiersza,28)->Set("hgw");
 				*/
 
 				Frame::Vel vp=pojazdy_pp.pojazd[piesi.pieszy[i].pojazdy.pp.nr[j]].frame[0].vel;
-				sheet->Cell(nr_wiersza,25)->Set(roundToNearest(sqrt(vp.x*vp.x+vp.y*vp.y)));
+				sheet->Cell(nr_wiersza,29)->Set(roundToNearest(sqrt(vp.x*vp.x+vp.y*vp.y)));
 
 
 				// wypisanie profilu predkosci pojazdu co x cm od 30 metra do 0

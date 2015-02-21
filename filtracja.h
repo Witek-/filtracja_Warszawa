@@ -77,4 +77,7 @@ SYSTEMTIME systemtime_z_daty(string text_time);
 string nastepny_dzien(string data);
 string data_z_systemtime(SYSTEMTIME st1);
 int liczba_dni_miedzy(string t1, string t2);
+
+
+	
 #endif
